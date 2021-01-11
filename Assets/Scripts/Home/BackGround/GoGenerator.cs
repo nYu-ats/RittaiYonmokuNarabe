@@ -9,14 +9,12 @@ public class GoGenerator : MonoBehaviour
     //碁をランダム生成する座標の範囲
     //Y座標は固定
     //XとZはおいおい変更する可能性があり、厳密に小数点で指定する必要がないため列挙子を使う
-    enum GoGeneratePositionRangeX
-    {
+    enum GoGeneratePositionRangeX{
         Start = -5,
         End = 5
     }
 
-    enum GoGeneratePositionRangeZ
-    {
+    enum GoGeneratePositionRangeZ{
         Start = 5,
         End = 10
     }
@@ -25,22 +23,18 @@ public class GoGenerator : MonoBehaviour
 
     private float time;
 
-    enum ColorFlag
-    {
+    enum ColorFlag{
         White = 0,
         Black = 1
     }
 
-    void Start()
-    {
+    void Start(){
         time = 0.0f;
     }
 
-    void Update()
-    {
+    void Update(){
         time += Time.deltaTime;
-        if(time > generateInterbal)
-        {
+        if(time > generateInterbal){
             float nextGeneratePositionX = Random.Range((float)((int)GoGeneratePositionRangeX.Start), (float)((int)GoGeneratePositionRangeX.End));
             float nextGeneratePositionZ = Random.Range((float)((int)GoGeneratePositionRangeZ.Start), (float)((int)GoGeneratePositionRangeZ.End));
             int nextGenerateColor = Random.Range(0,2);

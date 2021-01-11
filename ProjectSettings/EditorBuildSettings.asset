@@ -4,4 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Home.unity
+    guid: ee7b5002427d536439d915fc86a99179
+  - enabled: 1
+    path: Assets/Scenes/RittaiYonmoku.unity
+    guid: fbfa2a9a5a20b5745aebe3073abcb8dc
+  m_configObjects: {}
