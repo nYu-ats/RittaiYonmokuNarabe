@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1005257387568",
+    "firebase_url": "https://rittaiyonmoku-b3d9f-default-rtdb.firebaseio.com",
+    "project_id": "rittaiyonmoku-b3d9f",
+    "storage_bucket": "rittaiyonmoku-b3d9f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1005257387568:android:29dc6398378629cd0647f5",
+        "android_client_info": {
+          "package_name": "com.nYuAts.RittaiYonmoku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1005257387568-vipp0ol9bfuh5p6bstlbbkniu8gfdrtt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCl7BMtku5KYEHEwvcIqmLfcfM6ut7ugxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1005257387568-vipp0ol9bfuh5p6bstlbbkniu8gfdrtt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

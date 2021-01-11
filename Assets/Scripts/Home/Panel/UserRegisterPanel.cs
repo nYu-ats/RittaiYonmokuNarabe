@@ -31,7 +31,7 @@ public class UserRegisterPanel : MonoBehaviour
     */
     [SerializeField] Text connectingText;
 
-    private ConnectFirebase connectFirebase = new ConnectFirebase();
+    [SerializeField] ConnectFirebase connectFirebase;
     private bool validFlag;
 
 
@@ -39,11 +39,12 @@ public class UserRegisterPanel : MonoBehaviour
     public async void ButtonClicked(){
         //通信処理に入る直前に通信中メッセージを表示する
         connectingText.enabled = true;
-        validFlag = await CheckUserNameAsync(inputUserName);
-        await UniTask.WaitWhile(() => connectingText.enabled); //"connecting"表示有無で通信中か否か判断、通信の終了を待機
+        validFlag = await connectFirebase.ReadUserName(inputUserName);
+        await UniTask.WaitWhile(() => connectFirebase.connectingFlag); //"connecting"表示有無で通信中か否か判断、通信の終了を待機
+        Debug.Log(validFlag);
         
         if(validFlag){
-            connectingText.enabled = true; //続くユーザー名をDBに格納する処理のため再度"connecting"を表示
+            connectingText.enabled = connectFirebase.connectingFlag; //続くユーザー名をDBに格納する処理のため再度"connecting"を表示
             await RegisterUserNameAsync(inputUserName);
             await UniTask.WaitWhile(() => connectingText.enabled);
             PlayerPrefs.SetString("UserName", inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
@@ -53,12 +54,13 @@ public class UserRegisterPanel : MonoBehaviour
         }
     }
 
+    /*
     private async UniTask<bool> CheckUserNameAsync(string name){
-        await UniTask.Delay(3000);
+        bool tRead = await connectFirebase.ReadUserName(name);
         connectingText.enabled = false; //awaitしている処理が完了次第"connecting"を非表示化
-        bool tRead = connectFirebase.UserNameExists(name);
         return tRead;
     }
+    */
 
     private async UniTask RegisterUserNameAsync(string name){
         await UniTask.Delay(3000);

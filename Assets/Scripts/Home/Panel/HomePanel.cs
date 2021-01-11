@@ -42,7 +42,7 @@ public class HomePanel : MonoBehaviour
         SceneManager.LoadScene("RittaiYonmoku");
     }
 
-    private ConnectFirebase connectFirebase = new ConnectFirebase();
+    [SerializeField] ConnectFirebase connectFirebase;
     [SerializeField] Text connectingText;
 
     public async void MultiPlayButtonClicked(int modeNumber){
