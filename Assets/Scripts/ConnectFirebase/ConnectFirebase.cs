@@ -40,6 +40,8 @@ public class GameRecord
     }
 }
 
+class UserRecordNullException : Exception{}
+
 
 public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, ISetRecord, IGetRecord
 {
@@ -77,15 +79,21 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
 
     //レコードがなかった場合の処理が必要?
     public async UniTask<GameRecord> GetRecord(string userName){
-        return await reference.Child("record").Child(userName).GetValueAsync().ContinueWith(task => {
+        try{
+            return await reference.Child("record").Child(userName).GetValueAsync().ContinueWith(task => {
             if(task.Result.GetRawJsonValue() != null){
                 GameRecord gameRecord = JsonUtility.FromJson<GameRecord>(task.Result.GetRawJsonValue());
                 return gameRecord;
             }
             else{
-                return new GameRecord(0, 0);
+                throw new UserRecordNullException();
             }
         });
+        }
+        catch (UserRecordNullException){
+            await SetRecord(userName, 0, 0);
+            return await GetRecord(userName);
+        }
     }
 
     public async UniTask<int> Matching(){
