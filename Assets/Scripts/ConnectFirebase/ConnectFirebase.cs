@@ -26,7 +26,7 @@ interface ISetRecord{
 }
 
 interface IGetRecord{
-    UniTask<int[]> GetRecord(string userName);
+    UniTask<GameRecord> GetRecord(string userName);
 }
 
 public class GameRecord
@@ -76,14 +76,14 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
     }
 
     //レコードがなかった場合の処理が必要?
-    public async UniTask<int[]> GetRecord(string userName){
+    public async UniTask<GameRecord> GetRecord(string userName){
         return await reference.Child("record").Child(userName).GetValueAsync().ContinueWith(task => {
             if(task.Result.GetRawJsonValue() != null){
                 GameRecord gameRecord = JsonUtility.FromJson<GameRecord>(task.Result.GetRawJsonValue());
-                return new int[2]{gameRecord.win, gameRecord.lose};
+                return gameRecord;
             }
             else{
-                return new int[2]{0, 0};
+                return new GameRecord(0, 0);
             }
         });
     }
