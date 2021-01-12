@@ -56,9 +56,12 @@ public class HomePanel : MonoBehaviour
         SceneManager.LoadScene("RittaiYonmoku");
     }
 
+    //ゲーム本体のシーンが読み込まれたときのプレイモードの設定をする
+    //加えてゲームシーン->ホームシーンの時には呼び出す必要がないのでイベントハンドラーから消去しておく
     private void SetPlayMode(Scene loadScene, LoadSceneMode mode){
         GameController gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
         gameController.playMode = loadPlayMode;
+        //プレイモードが増えた時に分岐を追加しやすくするためswitchを使用
         switch(loadPlayMode){
             case (int)PlayMode.Solo:
             goto default;

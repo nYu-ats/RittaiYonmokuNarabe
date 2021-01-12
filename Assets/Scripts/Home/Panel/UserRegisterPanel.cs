@@ -39,45 +39,20 @@ public class UserRegisterPanel : MonoBehaviour
     public async void ButtonClicked(){
         connectingText.enabled = true; //通信処理に入る直前に通信中メッセージを表示する
         await UniTask.Run(async() => {
-            validFlag = await connectFirebase.ReadUserName(inputUserName);
+            validFlag = await connectFirebase.CheckUserNameValid(inputUserName);
             Debug.Log(validFlag);
             return validFlag;
         }).ContinueWith(async flag => {
         if(flag){
-            await RegisterUserNameAsync(inputUserName);
+            await connectFirebase.SetUserName(inputUserName);
             PlayerPrefs.SetString("UserName", inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
+            await connectFirebase.SetRecord(PlayerPrefs.GetString("UserName"), 50, 50);
             connectingText.enabled = false; //ユーザー登録が完了した段階で"connecting"メッセージを非表示に
         }
         else{
             connectingText.enabled = false;
             ShowAlert(true);
         }});
-        //validFlag = await connectFirebase.ReadUserName(inputUserName);
-        //await UniTask.WaitWhile(() => connectFirebase.waitFlag); //ユーザー情報読み取り中の間待機する
-        
-        /*if(validFlag){
-            connectingText.enabled = connectFirebase.waitFlag; //続くユーザー名をDBに格納する処理のため再度"connecting"を表示
-            await RegisterUserNameAsync(inputUserName);
-            await UniTask.WaitWhile(() => connectingText.enabled);
-            PlayerPrefs.SetString("UserName", inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
-        }
-        else{
-            ShowAlert(true);
-        }*/
-    }
-
-    /*
-    private async UniTask<bool> CheckUserNameAsync(string name){
-        bool tRead = await connectFirebase.ReadUserName(name);
-        connectingText.enabled = false; //awaitしている処理が完了次第"connecting"を非表示化
-        return tRead;
-    }
-    */
-
-    private async UniTask RegisterUserNameAsync(string name){
-        await UniTask.Delay(3000);
-        await UniTask.Run(() => connectFirebase.SetInfo(name));
-        connectingText.enabled = false;
     }
 }
 

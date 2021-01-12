@@ -9,24 +9,39 @@ using Firebase;
 using Firebase.Database;
 
 
-interface ISet{
-    void SetInfo(string setUserName);
+interface ISetUserName{
+    UniTask SetUserName(string setUserName);
 }
 
-interface IReadUserName{
-    UniTask<bool> ReadUserName(string userName);
-}
-
-interface IReadWinLose{
-    int[] ReadWinLose(string userName);
+interface ICheckUserNameValid{
+    UniTask<bool> CheckUserNameValid(string userName);
 }
 
 interface IMatching{
     int Matching(string userName);
 }
 
+interface ISetRecord{
+    UniTask SetRecord(string userName, int winCount, int loseCount);
+}
 
-public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
+interface IGetRecord{
+    UniTask<int[]> GetRecord(string userName);
+}
+
+public class GameRecord
+{
+    public int win;
+    public int lose;
+
+    public GameRecord(int winCount, int loseCount){
+        this.win = winCount;
+        this.lose = loseCount;
+    }
+}
+
+
+public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, ISetRecord, IGetRecord
 {
     public bool waitFlag = true; //呼び出し元を待機させるためのフラグ
     DatabaseReference reference;
@@ -36,7 +51,7 @@ public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
         //Start or Awakeメソッド内でreference作らないといけないらしい
         reference = FirebaseDatabase.DefaultInstance.RootReference;
     }
-    public async UniTask<bool> ReadUserName(string userName){
+    public async UniTask<bool> CheckUserNameValid(string userName){
         return await reference.Child("user").Child(userName).GetValueAsync().ContinueWith(task => {
             Debug.Log(task.Result.GetRawJsonValue()); //テスト用
             if(task.Result.GetRawJsonValue() == null){
@@ -50,12 +65,27 @@ public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
         });
     }
 
-    public async void SetInfo(string setUserName){
+    public async UniTask SetUserName(string setUserName){
         await reference.Child("user").Child(setUserName).SetValueAsync(true);
     }
 
-    public int[] ReadWinLose(string userName){
-        return new int[2]{100, 100};
+    public async UniTask SetRecord(string userName, int winCount, int loseCount){
+        GameRecord gameRecord = new GameRecord(winCount, loseCount);
+        string json = JsonUtility.ToJson(gameRecord);
+        await reference.Child("record").Child(userName).SetRawJsonValueAsync(json);
+    }
+
+    //レコードがなかった場合の処理が必要?
+    public async UniTask<int[]> GetRecord(string userName){
+        return await reference.Child("record").Child(userName).GetValueAsync().ContinueWith(task => {
+            if(task.Result.GetRawJsonValue() != null){
+                GameRecord gameRecord = JsonUtility.FromJson<GameRecord>(task.Result.GetRawJsonValue());
+                return new int[2]{gameRecord.win, gameRecord.lose};
+            }
+            else{
+                return new int[2]{0, 0};
+            }
+        });
     }
 
     public async UniTask<int> Matching(){
@@ -65,13 +95,3 @@ public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
         return gameRoomNumber;
     }
 }
-
-interface IDelete{
-
-}
-
-
-interface ISubscribe{
-    
-}
-
