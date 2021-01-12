@@ -47,10 +47,10 @@ public class HomePanel : MonoBehaviour
 
     public async void MultiPlayButtonClicked(int modeNumber){
         loadPlayMode = modeNumber;
-        connectingText.enabled = connectFirebase.connectingFlag;
+        connectingText.enabled = connectFirebase.waitFlag;
         gameRoom = await connectFirebase.Matching();
-        await UniTask.WaitWhile(() => connectFirebase.connectingFlag);
-        connectingText.enabled = connectFirebase.connectingFlag; 
+        await UniTask.WaitWhile(() => connectFirebase.waitFlag);
+        connectingText.enabled = connectFirebase.waitFlag; 
 
         SceneManager.sceneLoaded += SetPlayMode;
         SceneManager.LoadScene("RittaiYonmoku");

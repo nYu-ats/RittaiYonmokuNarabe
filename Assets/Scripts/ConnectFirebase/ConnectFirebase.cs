@@ -14,7 +14,7 @@ interface ISet{
 }
 
 interface IReadUserName{
-    Task<bool> ReadUserName(string userName);
+    UniTask<bool> ReadUserName(string userName);
 }
 
 interface IReadWinLose{
@@ -28,28 +28,30 @@ interface IMatching{
 
 public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
 {
-    public bool connectingFlag = true;
+    public bool waitFlag = true; //呼び出し元を待機させるためのフラグ
     DatabaseReference reference;
 
+
     void Start(){
+        //Start or Awakeメソッド内でreference作らないといけないらしい
         reference = FirebaseDatabase.DefaultInstance.RootReference;
     }
-    public async Task<bool> ReadUserName(string userName){
+    public async UniTask<bool> ReadUserName(string userName){
         return await reference.Child("user").Child(userName).GetValueAsync().ContinueWith(task => {
             Debug.Log(task.Result.GetRawJsonValue()); //テスト用
             if(task.Result.GetRawJsonValue() == null){
-                connectingFlag = false;
+                waitFlag = false;
                 return true;
             }
             else{
-                connectingFlag = false;
+                waitFlag = false;
                 return false;
             }
         });
     }
 
     public void SetInfo(string setValue){
-        Debug.Log("set");;
+        Debug.Log("set");
     }
 
     public int[] ReadWinLose(string userName){
@@ -59,7 +61,7 @@ public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
     public async UniTask<int> Matching(){
         await UniTask.Delay(5000);
         int gameRoomNumber = 100;
-        connectingFlag = false;
+        waitFlag = false;
         return gameRoomNumber;
     }
 }

@@ -10,7 +10,7 @@ public class UserInformationPanel : MonoBehaviour
     [SerializeField] Text winText;
     [SerializeField] Text loseText;
     [SerializeField] Text userNameText;
-    private ConnectFirebase connectFirebase = new ConnectFirebase();
+    [SerializeField] ConnectFirebase connectFirebase;
     async void Start()
     {
         string userName = PlayerPrefs.GetString("UserName"); //UserNameベタ打ちの部分は要修正
