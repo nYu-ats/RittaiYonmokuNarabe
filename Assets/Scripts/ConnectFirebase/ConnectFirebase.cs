@@ -10,7 +10,7 @@ using Firebase.Database;
 
 
 interface ISet{
-    void SetInfo(string setValue);
+    void SetInfo(string setUserName);
 }
 
 interface IReadUserName{
@@ -50,8 +50,8 @@ public class ConnectFirebase:MonoBehaviour, ISet, IReadUserName, IReadWinLose
         });
     }
 
-    public void SetInfo(string setValue){
-        Debug.Log("set");
+    public async void SetInfo(string setUserName){
+        await reference.Child("user").Child(setUserName).SetValueAsync(true);
     }
 
     public int[] ReadWinLose(string userName){

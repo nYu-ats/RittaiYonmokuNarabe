@@ -24,6 +24,7 @@ public class GameStartController : MonoBehaviour
         //すでにユーザー名登録がされていた場合は登録パネルの表示はしない
         userRegisterPanel.SetActive(!PlayerPrefs.HasKey(userNameKey));
         await UniTask.WaitUntil(() => PlayerPrefs.HasKey(userNameKey)); //ユーザー登録が完了するまで待機
+        Debug.Log(PlayerPrefs.GetString("UserName")); //ユーザー登録テスト用
         CheckPlayerSettingExists(); 
         userRegisterPanel.SetActive(false);
         HomePanel.SetActive(true);

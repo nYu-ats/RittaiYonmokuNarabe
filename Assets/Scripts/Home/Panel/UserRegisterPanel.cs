@@ -44,11 +44,12 @@ public class UserRegisterPanel : MonoBehaviour
             return validFlag;
         }).ContinueWith(async flag => {
         if(flag){
-            connectingText.enabled = connectFirebase.waitFlag; //続くユーザー名をDBに格納する処理のため再度"connecting"を表示
             await RegisterUserNameAsync(inputUserName);
             PlayerPrefs.SetString("UserName", inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
+            connectingText.enabled = false; //ユーザー登録が完了した段階で"connecting"メッセージを非表示に
         }
         else{
+            connectingText.enabled = false;
             ShowAlert(true);
         }});
         //validFlag = await connectFirebase.ReadUserName(inputUserName);
