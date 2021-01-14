@@ -45,10 +45,7 @@ class UserRecordNullException : Exception{}
 
 public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, ISetRecord, IGetRecord
 {
-    public bool waitFlag = true; //呼び出し元を待機させるためのフラグ
     DatabaseReference reference;
-
-
     void Start(){
         //Start or Awakeメソッド内でreference作らないといけないらしい
         reference = FirebaseDatabase.DefaultInstance.RootReference;
@@ -57,11 +54,9 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         return await reference.Child("user").Child(userName).GetValueAsync().ContinueWith(task => {
             Debug.Log(task.Result.GetRawJsonValue()); //テスト用
             if(task.Result.GetRawJsonValue() == null){
-                waitFlag = false;
                 return true;
             }
             else{
-                waitFlag = false;
                 return false;
             }
         });
@@ -95,6 +90,9 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         }
     }
 
+    public bool matchingFlag = false; //マッチング待機させるためのフラグ
+    public string gameRoomNumber = "";
+
     public async UniTask<int> Matching(){
         try{
             string gameRoom = "";
@@ -106,7 +104,14 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
                 return int.Parse(gameRoom);
             }
             else{
-                return 0;
+                gameRoomNumber = "01150202";
+                await reference.Child("matchingRoom").Child(gameRoomNumber).SetValueAsync(false);
+                reference.Child("matchingRoom").Child(gameRoomNumber).ValueChanged += ListenMatchingStatus;
+                Debug.Log("waiting");
+                await UniTask.WaitUntil(() => matchingFlag);
+                Debug.Log("matching");
+                gameRoom = gameRoomNumber;
+                return int.Parse(gameRoom);
             }
             });
         }
@@ -118,7 +123,6 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
     public async UniTask<string> CheckMatchingRoom(){
         try{
             //ルームの値がfalse or trueかの判断必要
-            string gameRoomNumber = "";
             return await reference.Child("matchingRoom").OrderByValue().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
                 gameRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので一旦文字列の切り出しでgameroomの取り出しをする
                 return gameRoomNumber;
@@ -127,5 +131,15 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         catch {
             return null;
         }          
+    }
+
+    public void ListenMatchingStatus(object sender, ValueChangedEventArgs args){
+        if(args.DatabaseError != null){
+            return;
+        }
+        if(Convert.ToBoolean(args.Snapshot.GetRawJsonValue()) == true){
+            matchingFlag = true;
+            reference.Child("matchingRoom").Child(gameRoomNumber).ValueChanged -= ListenMatchingStatus;
+        }
     }
 }
