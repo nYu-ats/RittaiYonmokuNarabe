@@ -49,6 +49,7 @@ public class HomePanel : MonoBehaviour
         loadPlayMode = modeNumber;
         connectingText.enabled = connectFirebase.waitFlag;
         gameRoom = await connectFirebase.Matching();
+        Debug.Log(gameRoom);
         await UniTask.WaitWhile(() => connectFirebase.waitFlag);
         connectingText.enabled = connectFirebase.waitFlag; 
 

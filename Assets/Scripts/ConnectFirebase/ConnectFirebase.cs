@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
-
+using System.Linq;
 
 interface ISetUserName{
     UniTask SetUserName(string setUserName);
@@ -77,7 +77,6 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         await reference.Child("record").Child(userName).SetRawJsonValueAsync(json);
     }
 
-    //レコードがなかった場合の処理が必要?
     public async UniTask<GameRecord> GetRecord(string userName){
         try{
             return await reference.Child("record").Child(userName).GetValueAsync().ContinueWith(task => {
@@ -97,9 +96,36 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
     }
 
     public async UniTask<int> Matching(){
-        await UniTask.Delay(5000);
-        int gameRoomNumber = 100;
-        waitFlag = false;
-        return gameRoomNumber;
+        try{
+            string gameRoom = "";
+            return await UniTask.Run(async () => {
+                gameRoom = await CheckMatchingRoom();
+            }).ContinueWith(async () => {
+                if(gameRoom != null){
+                await reference.Child("matchingRoom").Child(gameRoom).SetValueAsync(true);
+                return int.Parse(gameRoom);
+            }
+            else{
+                return 0;
+            }
+            });
+        }
+        catch (UserRecordNullException){
+            return 3;
+        }
+    }
+
+    public async UniTask<string> CheckMatchingRoom(){
+        try{
+            //ルームの値がfalse or trueかの判断必要
+            string gameRoomNumber = "";
+            return await reference.Child("matchingRoom").OrderByValue().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
+                gameRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので一旦文字列の切り出しでgameroomの取り出しをする
+                return gameRoomNumber;
+            });
+        }
+        catch {
+            return null;
+        }          
     }
 }

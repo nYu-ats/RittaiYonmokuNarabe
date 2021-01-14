@@ -40,14 +40,13 @@ public class UserRegisterPanel : MonoBehaviour
         connectingText.enabled = true; //通信処理に入る直前に通信中メッセージを表示する
         await UniTask.Run(async() => {
             validFlag = await connectFirebase.CheckUserNameValid(inputUserName);
-            Debug.Log(validFlag);
             return validFlag;
         }).ContinueWith(async flag => {
         if(flag){
             await connectFirebase.SetUserName(inputUserName);
             PlayerPrefs.SetString("UserName", inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
             await connectFirebase.SetRecord(PlayerPrefs.GetString("UserName"), 50, 50);
-            connectingText.enabled = false; //ユーザー登録が完了した段階で"connecting"メッセージを非表示に
+            connectingText.enabled = false;
         }
         else{
             connectingText.enabled = false;
