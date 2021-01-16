@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
@@ -8,21 +6,21 @@ using CommonConfig;
 
 public class HomePanel : MonoBehaviour
 {
-    [SerializeField] GameObject volumeSettingPanel;
     [SerializeField] GameObject returnButton;
-    private GameObject isActivePanel;
+    [SerializeField] Button volumeSettingOpenButton;
+    public GameObject isActivePanel;
 
-    public void VolumeSettingButtonClicked(GameObject isActiveObj){
-        volumeSettingPanel.SetActive(true);
+    void Start(){
+        //イベントハンドラーを追加
+        volumeSettingOpenButton.GetComponent<OpenPnaelButton>().panelActiveEvent += SwitchActivePanel;
+    }
+
+    //パネルを開くボタンからのイベントを受け取って
+    //IsActivePanelの更新と戻るボタンのActivateを行う
+    private void SwitchActivePanel(GameObject panel){
+        isActivePanel = panel;
         returnButton.SetActive(true);
-        isActivePanel = isActiveObj;
     }
-
-    public void ReeturnButtonClicked(){
-        isActivePanel.SetActive(false);
-        returnButton.SetActive(false);
-    }
-    
     public void ReviewButtonClicked(){
         Application.OpenURL(URL.GoogleAppStoreURL + URL.ThisAppId);
     }

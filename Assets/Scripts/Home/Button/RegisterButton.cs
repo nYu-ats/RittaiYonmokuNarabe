@@ -24,13 +24,13 @@ public class RegisterButton : MonoBehaviour
         connectingEvent(true); //通信処理に入る直前に通信中メッセージを表示する
         fetchUserNameEvent();
         await UniTask.Run(async() => {
-            validFlag = await connectFirebase.CheckUserNameValid(inputUserName);
+            validFlag = await connectFirebase.UserNameValidation(inputUserName);
             return validFlag;
         }).ContinueWith(async flag => {
         if(flag){
             await connectFirebase.SetUserName(inputUserName);
             PlayerPrefs.SetString(PlayerPrefsKey.UserNameKey, inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
-            await connectFirebase.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 50, 50);
+            await connectFirebase.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 0, 0); //初回なので勝敗共に0
             connectingEvent(false);
         }
         else{

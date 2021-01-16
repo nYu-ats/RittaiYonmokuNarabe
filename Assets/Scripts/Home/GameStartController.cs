@@ -12,6 +12,7 @@ public class GameStartController : MonoBehaviour
     
     //ゲーム起動時最初に実行させたいのでAwakeを使う
     async void Awake(){
+        //PlayerPrefs.DeleteKey("UserName"); //テスト用
         await DisplayTitlePanel(titleDisplayTime);
         await ChkUserRegister();
         DisplayHomePanel();

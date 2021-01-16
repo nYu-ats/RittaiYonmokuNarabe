@@ -6,12 +6,14 @@ using Firebase.Database;
 using FirebaseChildKey;
 using CustomException;
 
+//各処理をうまく分離して運用できる方法を検討
+//現状1つのファイルの1つのクラスに処理をまとめる or 各処理ごとにGameObjectを配置するかの2案
 interface ISetUserName{
     UniTask SetUserName(string setUserName);
 }
 
-interface ICheckUserNameValid{
-    UniTask<bool> CheckUserNameValid(string userName);
+interface IUserNameValidation{
+    UniTask<bool> UserNameValidation(string userName);
 }
 
 interface IMatching{
@@ -37,35 +39,45 @@ public class GameRecord
     }
 }
 
-public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, ISetRecord, IGetRecord
+//
+public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord
 {
     DatabaseReference reference;
     void Start(){
-        //Start or Awakeメソッド内でreference作らないといけないらしい
+        //Start or Awakeメソッド内でreference作らないといけない
         reference = FirebaseDatabase.DefaultInstance.RootReference;
     }
-    public async UniTask<bool> CheckUserNameValid(string userName){
-        return await reference.Child("user").Child(userName).GetValueAsync().ContinueWith(task => {
-            Debug.Log(task.Result.GetRawJsonValue()); //テスト用
-            if(task.Result.GetRawJsonValue() == null){
-                return true;
-            }
-            else{
-                return false;
-            }
-        });
+
+    //入力したユーザー名が既にFirabase上にないか確認する
+    public async UniTask<bool> UserNameValidation(string userName){
+        try{
+            return await reference.Child("user").Child(userName).GetValueAsync().ContinueWith(task => {
+                if(task.Result.GetRawJsonValue() == null){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            });
+        }
+        catch{
+            return false;
+        }
     }
 
+    //ユーザー名をFirebaseへ格納する
     public async UniTask SetUserName(string setUserName){
         await reference.Child(GetKey.UserKey).Child(setUserName).SetValueAsync(true);
     }
 
+    //勝敗レコードをFirebaseへ格納する
     public async UniTask SetRecord(string userName, int winCount, int loseCount){
         GameRecord gameRecord = new GameRecord(winCount, loseCount);
         string json = JsonUtility.ToJson(gameRecord);
         await reference.Child(GetKey.RecordKey).Child(userName).SetRawJsonValueAsync(json);
     }
 
+    //勝敗レコードをFirebaseから取得する
     public async UniTask<GameRecord> GetRecord(string userName){
         try{
             return await reference.Child(GetKey.RecordKey).Child(userName).GetValueAsync().ContinueWith(task => {
@@ -79,7 +91,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         });
         }
         catch (UserRecordNullException){
-            //ユーザーレコードがない初回ログイン時はwin : 0/lose : 0でセットされる
+            //何らかの理由でレコードがなかった場合、現状の対応としては勝敗共に0で初期化する
             await SetRecord(userName, 0, 0);
             return await GetRecord(userName);
         }
@@ -87,16 +99,15 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
 
     public bool matchingFlag = false; //マッチング待機するためのフラグ
     public string gameRoomNumber = "";
-
+    //マッチング処理
     public async UniTask<int> Matching(){
         try{
-            string gameRoom = "";
             return await UniTask.Run(async () => {
-                gameRoom = await CheckMatchingRoom();
+                gameRoomNumber = await CheckMatchingRoom();
             }).ContinueWith(async () => {
-                if(gameRoom != null){
-                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoom).SetValueAsync(true);
-                return int.Parse(gameRoom);
+                if(gameRoomNumber != null){
+                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(true);
+                return int.Parse(gameRoomNumber);
             }
             else{
                 gameRoomNumber = MakeMathingRoomNumber(); //ゲームルームの番号を発行する
@@ -104,24 +115,28 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
                 await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(false);
                 reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).ValueChanged += ListenMatchingStatus;
                 await UniTask.WaitUntil(() => matchingFlag);
+
                 //マッチングが完了次第、マッチングルームからゲームルーム番号を削除して値を返す
-                gameRoom = gameRoomNumber;
                 await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(null); //マッチング完了後はmatchinroomからキーを削除
-                return int.Parse(gameRoom);
+                return int.Parse(gameRoomNumber);
             }
             });
         }
-        catch (MatchingFaultException){
-            return 3;
+        catch {
+            //なんらかの理由でマッチングに失敗した場合は0を返して処理を終了する
+            return 0;
         }
     }
 
+    //待機ユーザーがいるかどうかの確認
     public async UniTask<string> CheckMatchingRoom(){
         try{
-            //ルームの値がfalse or trueかの判断必要
+            //昇順に並べ替えて最初のレコードを取得してくる
+            //下記返却値
+            //・待機ユーザーがいない場合->null
+            //・待機ユーザーがいる場合->ルーム番号
             return await reference.Child(GetKey.MatchingRoomKey).OrderByValue().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
-                gameRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので一旦文字列の切り出しでgameroomの取り出しをする
-                return gameRoomNumber;
+                return task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので文字列の切り出しでgameroomの取り出しをする
             });
         }
         catch {
@@ -129,8 +144,10 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         }          
     }
 
+    //作成した待機ルームの更新(マッチング)を待つ
     public void ListenMatchingStatus(object sender, ValueChangedEventArgs args){
         if(args.DatabaseError != null){
+            //エラーが発生した場合は読み取りを終える
             return;
         }
         if(Convert.ToBoolean(args.Snapshot.GetRawJsonValue()) == true){
@@ -139,9 +156,9 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         }
     }
 
+    //現時刻からルーム番号を生成するメソッド
+    //極力かぶりが発生しないようミリ秒単位まで含めて、分、秒、ミリ秒の値を繋げて番号を作成する
     public string MakeMathingRoomNumber(){
-        //現時刻をゲームルームとして利用
-        //極力かぶりが発生しないようミリ秒単位まで含める
         DateTime dateTime = DateTime.Now;
         string gameRoomString = String.Format("{0: HHmmssfff}", dateTime);
         return gameRoomString;
