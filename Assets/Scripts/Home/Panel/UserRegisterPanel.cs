@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using CommonConfig;
 
 public class UserRegisterPanel : MonoBehaviour
 {
@@ -44,8 +45,8 @@ public class UserRegisterPanel : MonoBehaviour
         }).ContinueWith(async flag => {
         if(flag){
             await connectFirebase.SetUserName(inputUserName);
-            PlayerPrefs.SetString("UserName", inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
-            await connectFirebase.SetRecord(PlayerPrefs.GetString("UserName"), 50, 50);
+            PlayerPrefs.SetString(PlayerPrefsKey.UserNameKey, inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
+            await connectFirebase.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 50, 50);
             connectingText.enabled = false;
         }
         else{

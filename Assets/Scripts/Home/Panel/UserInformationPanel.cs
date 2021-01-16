@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using CommonConfig;
 
 public class UserInformationPanel : MonoBehaviour
 {
@@ -13,8 +11,18 @@ public class UserInformationPanel : MonoBehaviour
     [SerializeField] ConnectFirebase connectFirebase;
     async void Start()
     {
-        string userName = PlayerPrefs.GetString("UserName"); //UserNameベタ打ちの部分は要修正
+        string userName = SetUserName();
+        await SetWinLoseCount(userName);
+    }
+
+    private string SetUserName(){
+        string userName = PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey);
         userNameText.text = userName;
+        return userName;
+    }
+
+    private async UniTask SetWinLoseCount(string userName){
+        //ユーザー名をキーにしてFirebaseから勝敗の履歴を取得する
         await UniTask.Run(async () => {
             GameRecord winLose = await connectFirebase.GetRecord(userName);
             return winLose;

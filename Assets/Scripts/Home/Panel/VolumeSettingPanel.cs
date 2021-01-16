@@ -2,36 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
-delegate void VolumeChangeEventHandler();
+using CommonConfig;
 
 public class VolumeSettingPanel : MonoBehaviour
 {
-    
-
-    private event VolumeChangeEventHandler changeEvent = () => {};
-
-    [SerializeField] VolumeButton[] volumeButtons;
-
-    void Start()
-    {
-        changeEvent += ChangeVolumeNumberFocus;
-        ChangeVolumeNumberFocus(); //音量フォーカス表示の初期化
-    }
-
-    public void ButtonClicked(int volume){
-        PlayerPrefs.SetInt("Volume", volume);
-        changeEvent();
-    }
-
-    //ボタン画像とテキストをまとめて管理できるようにする
+    delegate void VolumeChangeEventHandler(); //イベントを発生させるためのdelegate
+    private event VolumeChangeEventHandler uiUpdateEvent = () => {};
+    //インスペクターで扱いやすくするため、ボタン画像とテキストをまとめる
     [System.Serializable]
-    public struct VolumeButton{
+    public struct VolumeButtonUI{
         public Image volumeImage;
         public Text volumeText;
     }
-    private void ChangeVolumeNumberFocus(){
-        int focueIndex = PlayerPrefs.GetInt("Volume");
+    [SerializeField] VolumeButtonUI[] volumeButtons;
+
+    void Start()
+    {
+        uiUpdateEvent += ChangeVolumeFocus; //イベントハンドラー追加
+        uiUpdateEvent(); 
+    }
+
+    //各ボリュームボタンがクリックされたときの処理
+    //各ボリューム値を受け取って設定 -> UIの表示更新イベントを発生させる
+    public void ButtonClicked(int volume){
+        PlayerPrefs.SetInt(PlayerPrefsKey.VolumeKey, volume);
+        uiUpdateEvent();
+    }
+
+    //設定されている音量をフォーカスさせる
+    private void ChangeVolumeFocus(){
+        int focueIndex = PlayerPrefs.GetInt(PlayerPrefsKey.VolumeKey);
         for(int index=0; index < volumeButtons.Length; index++){
             if(index != focueIndex){
                 volumeButtons[index].volumeImage.GetComponent<Image>().color = new Color(255, 255, 255, 1);

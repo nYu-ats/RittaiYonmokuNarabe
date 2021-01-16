@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using CommonConfig;
 
 interface IPlaySE{
     void PlaySound(int clipNumber);
@@ -8,10 +7,9 @@ interface IPlaySE{
 
 public class PlaySE : MonoBehaviour, IPlaySE
 {
-    private const float maxVolume = 2.0f;
     private float volume = 0.0f;
     void Start(){
-        volume = PlayerPrefs.GetInt("Volume") / maxVolume;
+        volume = PlayerPrefs.GetInt(PlayerPrefsKey.VolumeKey) / AudioConfig.MaxVolume;
         this.GetComponent<AudioSource>().volume = volume;
     }
 

@@ -8,6 +8,8 @@ using Cysharp.Threading.Tasks;
 using Firebase;
 using Firebase.Database;
 using System.Linq;
+using FirebaseChildKey;
+using CustomException;
 
 interface ISetUserName{
     UniTask SetUserName(string setUserName);
@@ -40,9 +42,6 @@ public class GameRecord
     }
 }
 
-class UserRecordNullException : Exception{}
-
-
 public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, ISetRecord, IGetRecord
 {
     DatabaseReference reference;
@@ -63,18 +62,18 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
     }
 
     public async UniTask SetUserName(string setUserName){
-        await reference.Child("user").Child(setUserName).SetValueAsync(true);
+        await reference.Child(GetKey.UserKey).Child(setUserName).SetValueAsync(true);
     }
 
     public async UniTask SetRecord(string userName, int winCount, int loseCount){
         GameRecord gameRecord = new GameRecord(winCount, loseCount);
         string json = JsonUtility.ToJson(gameRecord);
-        await reference.Child("record").Child(userName).SetRawJsonValueAsync(json);
+        await reference.Child(GetKey.RecordKey).Child(userName).SetRawJsonValueAsync(json);
     }
 
     public async UniTask<GameRecord> GetRecord(string userName){
         try{
-            return await reference.Child("record").Child(userName).GetValueAsync().ContinueWith(task => {
+            return await reference.Child(GetKey.RecordKey).Child(userName).GetValueAsync().ContinueWith(task => {
             if(task.Result.GetRawJsonValue() != null){
                 GameRecord gameRecord = JsonUtility.FromJson<GameRecord>(task.Result.GetRawJsonValue());
                 return gameRecord;
@@ -85,12 +84,13 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         });
         }
         catch (UserRecordNullException){
+            //ユーザーレコードがない初回ログイン時はwin : 0/lose : 0でセットされる
             await SetRecord(userName, 0, 0);
             return await GetRecord(userName);
         }
     }
 
-    public bool matchingFlag = false; //マッチング待機させるためのフラグ
+    public bool matchingFlag = false; //マッチング待機するためのフラグ
     public string gameRoomNumber = "";
 
     public async UniTask<int> Matching(){
@@ -100,22 +100,23 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
                 gameRoom = await CheckMatchingRoom();
             }).ContinueWith(async () => {
                 if(gameRoom != null){
-                await reference.Child("matchingRoom").Child(gameRoom).SetValueAsync(true);
+                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoom).SetValueAsync(true);
                 return int.Parse(gameRoom);
             }
             else{
-                gameRoomNumber = "01150202";
-                await reference.Child("matchingRoom").Child(gameRoomNumber).SetValueAsync(false);
-                reference.Child("matchingRoom").Child(gameRoomNumber).ValueChanged += ListenMatchingStatus;
-                Debug.Log("waiting");
+                gameRoomNumber = MakeMathingRoomNumber(); //ゲームルームの番号を発行する
+                //値falseで初期セットしておき、trueになるまで待機する
+                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(false);
+                reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).ValueChanged += ListenMatchingStatus;
                 await UniTask.WaitUntil(() => matchingFlag);
-                Debug.Log("matching");
+                //マッチングが完了次第、マッチングルームからゲームルーム番号を削除して値を返す
                 gameRoom = gameRoomNumber;
+                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(null); //マッチング完了後はmatchinroomからキーを削除
                 return int.Parse(gameRoom);
             }
             });
         }
-        catch (UserRecordNullException){
+        catch (MatchingFaultException){
             return 3;
         }
     }
@@ -123,7 +124,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
     public async UniTask<string> CheckMatchingRoom(){
         try{
             //ルームの値がfalse or trueかの判断必要
-            return await reference.Child("matchingRoom").OrderByValue().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
+            return await reference.Child(GetKey.MatchingRoomKey).OrderByValue().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
                 gameRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので一旦文字列の切り出しでgameroomの取り出しをする
                 return gameRoomNumber;
             });
@@ -139,7 +140,15 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, ICheckUserNameValid, I
         }
         if(Convert.ToBoolean(args.Snapshot.GetRawJsonValue()) == true){
             matchingFlag = true;
-            reference.Child("matchingRoom").Child(gameRoomNumber).ValueChanged -= ListenMatchingStatus;
+            reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).ValueChanged -= ListenMatchingStatus;
         }
+    }
+
+    public string MakeMathingRoomNumber(){
+        //現時刻をゲームルームとして利用
+        //極力かぶりが発生しないようミリ秒単位まで含める
+        DateTime dateTime = DateTime.Now;
+        string gameRoomString = String.Format("{0: HHmmssfff}", dateTime);
+        return gameRoomString;
     }
 }

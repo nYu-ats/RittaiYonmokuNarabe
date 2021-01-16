@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
+using CommonConfig;
 
 public class HomePanel : MonoBehaviour
 {
@@ -21,11 +22,9 @@ public class HomePanel : MonoBehaviour
         isActivePanel.SetActive(false);
         returnButton.SetActive(false);
     }
-
-    private const string thisAppId = "mitei"; //要修正
-    private const string GoogleAppStoreURL = "https://play.google.com/store/apps/details?id=";
+    
     public void ReviewButtonClicked(){
-        Application.OpenURL(GoogleAppStoreURL + thisAppId);
+        Application.OpenURL(URL.GoogleAppStoreURL + URL.ThisAppId);
     }
 
     int loadPlayMode = 0;
@@ -39,7 +38,7 @@ public class HomePanel : MonoBehaviour
     public void SoloPlayButtonClicked(int modeNumber){
         loadPlayMode = modeNumber;
         SceneManager.sceneLoaded += SetPlayMode;
-        SceneManager.LoadScene("RittaiYonmoku");
+        SceneManager.LoadScene(GameSceneName.GameScene);
     }
 
     [SerializeField] ConnectFirebase connectFirebase;
@@ -53,13 +52,13 @@ public class HomePanel : MonoBehaviour
         connectingText.enabled = false; 
 
         SceneManager.sceneLoaded += SetPlayMode;
-        SceneManager.LoadScene("RittaiYonmoku");
+        SceneManager.LoadScene(GameSceneName.GameScene);
     }
 
     //ゲーム本体のシーンが読み込まれたときのプレイモードの設定をする
     //加えてゲームシーン->ホームシーンの時には呼び出す必要がないのでイベントハンドラーから消去しておく
     private void SetPlayMode(Scene loadScene, LoadSceneMode mode){
-        GameController gameController = GameObject.FindWithTag("GameController").GetComponent<GameController>();
+        GameController gameController = GameObject.FindWithTag(Tags.InRittaiYonmoku.GameController).GetComponent<GameController>();
         gameController.playMode = loadPlayMode;
         //プレイモードが増えた時に分岐を追加しやすくするためswitchを使用
         switch(loadPlayMode){
