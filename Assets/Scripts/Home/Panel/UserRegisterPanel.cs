@@ -1,58 +1,42 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
-using CommonConfig;
 
 public class UserRegisterPanel : MonoBehaviour
 {
     [SerializeField] InputField inputField;
     [SerializeField] Text inputText;
     [SerializeField] Text userNameAlreadyExist;
+    [SerializeField] Text connectingText;
+    [SerializeField] Button registerButton;
 
     private string inputUserName = "";
 
-    //フォームへの入力内容をテキストフィールドに反映させる
+    void Start(){
+        //スタート時に登録ボタンの各イベントにイベントハンドラーを登録する
+        registerButton.GetComponent<RegisterButton>().showAlertEvent += ShowAlert;
+        registerButton.GetComponent<RegisterButton>().connectingEvent += ShowConnecting;
+        registerButton.GetComponent<RegisterButton>().fetchUserNameEvent += SetSendUserName;
+    }
+
+    //フォームへの入力内容をテキストフィールドに反映させるメソッド
     public void ReflectInputText(){
         inputText.text = inputField.text;
         inputUserName = inputField.text;
     }
 
     //すでに使用済みの名前を入力していた場合はアラートを出す
-    public void ShowAlert(bool status){
+    private void ShowAlert(bool status){
         userNameAlreadyExist.enabled = status;
     }
 
+    //送信ボタンがクリックされたときに入力済みのユーザー名をセットする
+    public void SetSendUserName(){
+        registerButton.GetComponent<RegisterButton>().inputUserName = inputField.text;
+    }
 
-    /*
-    下記ボタン処理
-    UserRegisterからの分離の検討が必要
-    */
-    [SerializeField] Text connectingText;
-
-    [SerializeField] ConnectFirebase connectFirebase;
-    private bool validFlag = false;
-
-
-
-    public async void ButtonClicked(){
-        connectingText.enabled = true; //通信処理に入る直前に通信中メッセージを表示する
-        await UniTask.Run(async() => {
-            validFlag = await connectFirebase.CheckUserNameValid(inputUserName);
-            return validFlag;
-        }).ContinueWith(async flag => {
-        if(flag){
-            await connectFirebase.SetUserName(inputUserName);
-            PlayerPrefs.SetString(PlayerPrefsKey.UserNameKey, inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
-            await connectFirebase.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 50, 50);
-            connectingText.enabled = false;
-        }
-        else{
-            connectingText.enabled = false;
-            ShowAlert(true);
-        }});
+    //通信中にconnectingテキストを表示、終わり次第非表示にする
+    public void ShowConnecting(bool status){
+        connectingText.enabled = status;
     }
 }
 
