@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class GoGenerator : MonoBehaviour
+public class GoGeneratorHome : MonoBehaviour
 {
     [SerializeField] GameObject[] go;
     [SerializeField] float generateInterbal = 3.0f;

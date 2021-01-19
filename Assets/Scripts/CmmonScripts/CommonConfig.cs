@@ -55,4 +55,19 @@ namespace CommonConfig
         public static string GoogleAppStoreURL{get {return googleAppStoreURL;}}
 
     }
+
+    public class BoardStatus
+    {
+        private const int canNotPut = -1;
+        public static int CanNotPut{get {return canNotPut;}}
+
+        private const int vacant = 0;
+        public static int Vacant{get {return vacant;}}
+
+        private const int goWhite = 1;
+        public static int GoWhite{get {return goWhite;}}
+
+        private const int goBlack = 2;
+        public static int GoBlack{get {return goBlack;}}
+    }
 }

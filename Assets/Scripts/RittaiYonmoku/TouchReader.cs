@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputReader : MonoBehaviour
+public class TouchReader : MonoBehaviour
 {
     [SerializeField] CameraMover cameraMover;
     private Vector2 baseTapPos;
