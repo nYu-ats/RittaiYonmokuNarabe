@@ -12,9 +12,13 @@ public class InputReader : MonoBehaviour
         if(Input.touchCount == 2){
             CalcPinchPercentage();
         }
-        else{
+        else if(Input.touchCount ==1){
             CalcScrollDistance();
         }
+        else{
+            return;
+        }
+
     }
 
     //ピンチインピンチアウトの割合計算
@@ -34,12 +38,13 @@ public class InputReader : MonoBehaviour
 
     //画面スクロールの距離計算
     private void CalcScrollDistance(){
-        if(Input.GetMouseButtonDown(0)){
+        Touch touchPoint = Input.GetTouch(0);
+        if(touchPoint.phase == TouchPhase.Began){
         //タップの基準位置取得
-        baseTapPos = Input.mousePosition;
+        baseTapPos = touchPoint.position;
         }
-        else if(Input.GetMouseButton(0)){
-            Vector2 tmpTapPos = Input.mousePosition;
+        else if(touchPoint.phase == TouchPhase.Moved){
+            Vector2 tmpTapPos = touchPoint.position;
             Vector2 moveInterval = tmpTapPos - baseTapPos;
             cameraMover.RollCamera(moveInterval);
             baseTapPos = tmpTapPos; //タップの基準位置を更新

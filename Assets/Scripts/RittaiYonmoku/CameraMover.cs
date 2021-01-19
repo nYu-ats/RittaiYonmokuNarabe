@@ -36,15 +36,11 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
     private float tmpRadius;
 
     void Start(){
-        //カメラポジションの初期化
-        tmpTheta = initialTheata;
-        tmpPhi = initialPhi;
-        tmpRadius = initialRadius;
-        UpdateCamerPos(tmpRadius, initialTheata, initialPhi);
+        InitializeCameraPos();
     }
 
 
-    public void UpdateCamerPos(float radius, float theta, float phi){
+    private void UpdateCamerPos(float radius, float theta, float phi){
         //カメラポジションを更新する
         float posX = radius * Mathf.Cos(theta * Mathf.PI / 180.0f) * Mathf.Sin(phi * Mathf.PI / 180.0f);
         float posY = radius * Mathf.Sin(theta * Mathf.PI / 180.0f);
@@ -52,6 +48,15 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
         this.gameObject.transform.position = new Vector3(posX, posY, posZ);
         this.gameObject.transform.rotation = Quaternion.Euler(theta, 180.0f + phi, 0); //カメラのデフォルトの向きがZ軸正のため、Y軸周りに反転させる
     }
+
+    public void InitializeCameraPos(){
+        //カメラポジションの初期化
+        tmpTheta = initialTheata;
+        tmpPhi = initialPhi;
+        tmpRadius = initialRadius;
+        UpdateCamerPos(tmpRadius, initialTheata, initialPhi);
+    }
+
 
     public void RollCamera(Vector2 interval){
         //カメラ視点回転実装
