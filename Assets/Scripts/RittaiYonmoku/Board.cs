@@ -5,7 +5,7 @@ using System.Linq;
 using CommonConfig;
 
 interface IAddGo{
-    //Y軸についてはユーザー指定ができないため碁を追加する際はX及びZのインデックスで行う
+    //Y軸について碁が積み上げられていくだけなので、碁を追加する際はX及びZのインデックスのみを指定
     void AddGo(int xIndex, int zIndex, int addColor);
 }
 public class Board : MonoBehaviour, IAddGo
@@ -42,10 +42,9 @@ public class Board : MonoBehaviour, IAddGo
     };
 
     public void AddGo(int xIndex, int zIndex, int addColor){
-        int yIndex = CanPutZIndex(xIndex, zIndex);
-        Debug.Log(zIndex);
+        int yIndex = PutYIndex(xIndex, zIndex);
         if(yIndex != BoardStatus.CanNotPut){
-            boardArray[xIndex][zIndex][zIndex] = addColor;
+            boardArray[xIndex][zIndex][yIndex] = addColor;
             goGenerator.PutGo(xIndex, zIndex, addColor);
         }
         else{
@@ -53,7 +52,8 @@ public class Board : MonoBehaviour, IAddGo
         }
     }
 
-    private int CanPutZIndex(int xIndex, int zIndex){
+    private int PutYIndex(int xIndex, int zIndex){
+        //碁が追加されるY方向のインデックスを取得する
         try{
             return boardArray[xIndex][zIndex].Select((item, index) => new {Index = index, Value = item})
             .Where(item => item.Value == 0 ).Select(item => item.Index).First();
