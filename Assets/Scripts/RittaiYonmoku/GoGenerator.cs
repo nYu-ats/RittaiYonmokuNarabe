@@ -12,10 +12,10 @@ public class GoGenerator : MonoBehaviour, IPutGo
 
     //碁を生成するためのXとZ座標の設定
     private (float x, float z)[][] pointXZ = new (float, float)[][]{
-        new(float, float)[]{(4.5f, 4.5f), (1.5f, 4.5f), (-1.5f, 4.5f), (-4.5f, 4.5f)},
-        new(float, float)[]{(4.5f, 1.5f), (1.5f, 1.5f), (-1.5f, 1.5f), (-4.5f, 1.5f)},
-        new(float, float)[]{(4.5f, -1.5f), (1.5f, -1.5f), (-1.5f, -1.5f), (-4.5f, -1.5f)},
-        new(float, float)[]{(4.5f, -4.5f), (1.5f, -4.5f), (-1.5f, -4.5f), (-4.5f, -4.5f)}
+        new(float, float)[]{(4.5f, 4.5f), (4.5f, 1.5f), (4.5f, -1.5f), (4.5f, -4.5f)},
+        new(float, float)[]{(1.5f, 4.5f), (1.5f, 1.5f), (1.5f, -1.5f), (1.5f, -4.5f)},
+        new(float, float)[]{(-1.5f, 4.5f), (-1.5f, 1.5f), (-1.5f, -1.5f), (-1.5f, -4.5f)},
+        new(float, float)[]{(-4.5f, 4.5f), (-4.5f, 1.5f), (-4.5f, -1.5f), (-4.5f, -4.5f)}
         };
 
     public void PutGo(int xIndex, int zIndex, int addColor){

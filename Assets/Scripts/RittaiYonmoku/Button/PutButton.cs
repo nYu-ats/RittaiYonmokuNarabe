@@ -7,12 +7,11 @@ public class PutButton : MonoBehaviour
 {
     [SerializeField] Board board;
     //テスト用
-    [SerializeField] int indexX = 0;
-    [SerializeField] int indexY = 0;
+    [SerializeField] PutPositionPanel putPositionPanel;
     private int goColor = BoardStatus.GoWhite;
 
     public void OnClicked(){
-        board.AddGo(indexX, indexY, goColor);
+        board.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
         if(goColor == BoardStatus.GoWhite){
             goColor = BoardStatus.GoBlack;
         }

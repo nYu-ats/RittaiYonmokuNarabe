@@ -33,6 +33,7 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
     }
     private float tmpTheta;
     private float tmpPhi;
+    public float TmpPhi{get {return tmpPhi;}} //碁を置く位置を決定するボードを視点の回転と同期させるために横回転のphiのgetを定義
     private float tmpRadius;
 
     void Start(){
