@@ -53,11 +53,24 @@ namespace CommonConfig
 
         private const string googleAppStoreURL = "https://play.google.com/store/apps/details?id=";
         public static string GoogleAppStoreURL{get {return googleAppStoreURL;}}
+    }
 
+    public class GameRule
+    {
+        //基礎となるゲームルール
+        private const string firstAttack = "White"; //白が先行
+        public static string FirstAttack{get {return firstAttack;}}
+
+        private const string secondAttack = "Black"; //黒が後攻
+        public static string SecondAttack{get {return secondAttack;}}
+
+        private const int totalGoNumber = 64; //碁の総数は64個
+        public static int TotalGoNumber{get {return totalGoNumber;}}
     }
 
     public class BoardStatus
     {
+        //ボードのステータスに関する設定
         private const int canNotPut = -1;
         public static int CanNotPut{get {return canNotPut;}}
 

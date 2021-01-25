@@ -8,15 +8,19 @@ public class PutButton : MonoBehaviour
     [SerializeField] Board board;
     //テスト用
     [SerializeField] PutPositionPanel putPositionPanel;
-    private int goColor = BoardStatus.GoWhite;
+    [SerializeField] GameController gameController;
+    private int goColor;
+
+    void Start(){
+        if(gameController.Player == GameRule.FirstAttack){
+            goColor = BoardStatus.GoWhite;
+        }
+        else{
+            goColor = BoardStatus.GoBlack;
+        }
+    }
 
     public void OnClicked(){
         board.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
-        if(goColor == BoardStatus.GoWhite){
-            goColor = BoardStatus.GoBlack;
-        }
-        else if(goColor == BoardStatus.GoBlack){
-            goColor = BoardStatus.GoWhite;
-        }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using CommonConfig;
 
 /*
-X、Z座標を並べた文字列を各ボタンの名前として設定している
+インスペクター上ではX、Z座標を並べた文字列を各ボタンの名前として設定
 */
 
 public class PutPositionPanel : MonoBehaviour
@@ -30,7 +30,7 @@ public class PutPositionPanel : MonoBehaviour
     }
 
     public void SelectedPositionUpdate(int indexX, int indexZ){
-        if(board.CheckCanPutYIndex(indexX, indexZ) == BoardStatus.CanNotPut){
+        if(board.CheckCanPut(indexX, indexZ) == BoardStatus.CanNotPut){
             //すでに4つの碁が置かれている棒には移動できないようにする
             return;
         }

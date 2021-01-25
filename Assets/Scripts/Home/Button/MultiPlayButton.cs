@@ -15,7 +15,7 @@ public class MultiPlayButton : BasePlayButton
         gameRoom = await connectFirebase.Matching();
         connectingText.enabled = false; 
 
-        SceneManager.sceneLoaded += SetPlayMode;
+        SceneManager.sceneLoaded += SetGameVariable;
         SceneManager.LoadScene(GameSceneName.GameScene);
     }
 }
