@@ -25,15 +25,17 @@ public class ReachLine
     //配列だと外部から扱いずらいためリーチラインクラスを作成
     //リーチが発生した際のエフェクト再生及びNPCでリーチを防ぐ動きをさせる目的でリーチチェックを行うため
     //リーチラインの始点と終点のみ分かればよい
+    public int reachColor;
     public (int x, int y, int z) lineStartPos;
     public (int x, int y, int z) lineEndPos;
-    public ReachLine((int x, int y, int z)[] reachPos){
+    public ReachLine((int x, int y, int z)[] reachPos, int color){
         lineStartPos.x = reachPos[0].x;
         lineStartPos.y = reachPos[0].y;
         lineStartPos.z = reachPos[0].z;
         lineEndPos.x = reachPos[2].x;
         lineEndPos.y = reachPos[2].y;
         lineEndPos.z = reachPos[2].z;
+        reachColor = color;
     }
 }
 public class Board : MonoBehaviour, IAddGo, ICheckCanPut, IHasReachLine
@@ -101,16 +103,6 @@ public class Board : MonoBehaviour, IAddGo, ICheckCanPut, IHasReachLine
             }
             boardUpdated();
         }
-        /*int yIndex = CheckCanPut(xIndex, zIndex);
-        if(yIndex != BoardStatus.CanNotPut){
-            boardArray[xIndex][zIndex][yIndex] = addColor;
-            goGenerator.PutGo(xIndex, zIndex, addColor);
-            boardUpdated();
-        }
-        else{
-            return;
-        }
-        */
     }
 
     public int CheckCanPut(int xIndex, int zIndex){
@@ -132,34 +124,61 @@ public class Board : MonoBehaviour, IAddGo, ICheckCanPut, IHasReachLine
     }
 
     public ReachLine[] HasReachLine(){
-        //黒のリーチラインチェック
-        //黒の碁が置かれている座標を取得
         try{
-            (int x, int z, int y)[] tmpArray = 
+            //黒のリーチラインチェック
+            //黒の碁が置かれている座標を取得
+            (int x, int z, int y)[] blackCandidatehXY = 
             posArray.Select((item, index) => new {Index = index, Value = item})
             .Where(item => boardStatusArray[item.Index] == BoardStatus.GoBlack)
             .Select(item => item.Value).ToArray();
             //絞り込んだ座標の中からリーチがかかっているラインを抽出して返す
-            return ChkReachLine(tmpArray);
+            ReachLine[] blackReachLines = ChkReachLine(blackCandidatehXY, BoardStatus.GoBlack);
+            Debug.Log(blackReachLines[0]);
+
+            //白のリーチラインチェック
+            (int x, int z, int y)[] whiteCandidatehXY = 
+            posArray.Select((item, index) => new {Index = index, Value = item})
+            .Where(item => boardStatusArray[item.Index] == BoardStatus.GoWhite)
+            .Select(item => item.Value).ToArray();
+            ReachLine[] whiteReachLines = ChkReachLine(blackCandidatehXY, BoardStatus.GoWhite);
+
+            //白と黒のリーチラインを結合
+            ReachLine[] allReachLines = blackReachLines.Concat(whiteReachLines).ToArray();
+            Debug.Log(allReachLines[0]);
+            return allReachLines;
         }
         catch{
             return null;
         }
-
-        //白のリーチラインチェック
     }
 
-    private ReachLine[] ChkReachLine((int x, int z, int y)[] candidatePos){
+    private ReachLine[] ChkReachLine((int x, int z, int y)[] candidatePos, int color){
         try{
-            ReachLine[] reachLines = new ReachLine[1];
+            ReachLine[] reachLines = new ReachLine[0]{};
             //リーチ条件1 : XとY座標が同じライン
             (int x, int z, int y)[] reachXY = candidatePos.GroupBy(item => new { PosX = item.x, PosY = item.y})
             .Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
-            reachLines[0] = new ReachLine(reachXY);
+            reachLines = reachLines.Concat(MakeReachLineArray(reachXY, color)).ToArray();
             return reachLines;
         }
         catch{
             return null;
+        }
+    }
+
+    private ReachLine[] MakeReachLineArray((int x, int z, int y)[] reachPos, int color){
+        if(reachPos.Length % 3 == 0){
+            //リーチライン候補が3の倍数個あった場合のみ処理を行う
+            ReachLine[] reachLines = new ReachLine[reachPos.Length / 3];
+            for(int index = 0; index < reachPos.Length / 3; index++){
+                ReachLine tmpReachLine = new ReachLine(reachPos.Skip(index * 3).Take(3).ToArray(), color); //リーチラインの切り出し
+                reachLines[index] = tmpReachLine;
+            }
+            return reachLines;
+        }
+        else{
+            //リーチライン候補が3の倍数来なかった場合は、空の配列を返す
+            return new ReachLine[0]{};
         }
     }
 }
