@@ -9,6 +9,8 @@ public class NPC : MonoBehaviour
     [SerializeField] GameController gameController;
     private string myColor;
     private bool thinking = false;
+    private int testIndexX = 1;
+    private int testIndexZ = 1;
 
     void Start(){
         myColor = gameController.Rival;
@@ -17,7 +19,13 @@ public class NPC : MonoBehaviour
         if(myColor == gameController.CurrentTurn & !thinking){
             thinking = true;
             await UniTask.Delay(3000);
-            board.AddGo(1, 1, 2);
+            board.AddGo(testIndexX, testIndexZ, 2);
+            testIndexX += 1;
+            testIndexZ += 1;
+            if(testIndexX >3){
+                testIndexX -= 1;
+                testIndexZ -= 1;
+            }
             thinking = false;
         }
     }

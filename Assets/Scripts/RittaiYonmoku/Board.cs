@@ -26,49 +26,14 @@ public class ReachLine
     //リーチが発生した際のエフェクト再生及びNPCでリーチを防ぐ動きをさせる目的でリーチチェックを行うため
     //リーチラインの始点と終点のみ分かればよい
     public int reachColor;
-    public (int x, int y, int z) lineStartPos;
-    public (int x, int y, int z) lineEndPos;
-    public ReachLine((int x, int y, int z)[] reachPos, int color){
-        lineStartPos.x = reachPos[0].x;
-        lineStartPos.y = reachPos[0].y;
-        lineStartPos.z = reachPos[0].z;
-        lineEndPos.x = reachPos[2].x;
-        lineEndPos.y = reachPos[2].y;
-        lineEndPos.z = reachPos[2].z;
+    public (int x, int y, int z)[] reachPos;
+    public ReachLine((int x, int y, int z)[] posision, int color){
+        reachPos = posision;
         reachColor = color;
     }
 }
 public class Board : MonoBehaviour, IAddGo, ICheckCanPut, IHasReachLine
 {
-    //4×4×4のボードを表す
-    //配列の切り出しが行いやすく、LInqで扱えるためジャグ配列を使う
-    //碁が置かれていない状態として0で初期化
-    private int[][][] boardArray = new int[4][][]{
-        new int[4][]{
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0}
-        },
-        new int[4][]{
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0}
-        },
-        new int[4][]{
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0}
-        },
-        new int[4][]{
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0},
-            new int[4]{0, 0, 0, 0}
-        }
-    };
     [SerializeField] GoGenerator goGenerator;
 
     public delegate void BoardUpdateEventHandler();
@@ -132,33 +97,96 @@ public class Board : MonoBehaviour, IAddGo, ICheckCanPut, IHasReachLine
             .Where(item => boardStatusArray[item.Index] == BoardStatus.GoBlack)
             .Select(item => item.Value).ToArray();
             //絞り込んだ座標の中からリーチがかかっているラインを抽出して返す
-            ReachLine[] blackReachLines = ChkReachLine(blackCandidatehXY, BoardStatus.GoBlack);
-            Debug.Log(blackReachLines[0]);
+            ReachLine[] blackReachLines = SearchReachLine(blackCandidatehXY, BoardStatus.GoBlack);
 
             //白のリーチラインチェック
             (int x, int z, int y)[] whiteCandidatehXY = 
             posArray.Select((item, index) => new {Index = index, Value = item})
             .Where(item => boardStatusArray[item.Index] == BoardStatus.GoWhite)
             .Select(item => item.Value).ToArray();
-            ReachLine[] whiteReachLines = ChkReachLine(blackCandidatehXY, BoardStatus.GoWhite);
+            ReachLine[] whiteReachLines = SearchReachLine(whiteCandidatehXY, BoardStatus.GoWhite);
 
             //白と黒のリーチラインを結合
             ReachLine[] allReachLines = blackReachLines.Concat(whiteReachLines).ToArray();
-            Debug.Log(allReachLines[0]);
-            return allReachLines;
+            if(allReachLines.Length > 0){
+                //1つ以上のリーチがある場合は配列を返す
+                return allReachLines;
+            }
+            else{
+                return null;
+            }
         }
         catch{
             return null;
         }
     }
 
-    private ReachLine[] ChkReachLine((int x, int z, int y)[] candidatePos, int color){
+    private ReachLine[] SearchReachLine((int x, int z, int y)[] candidatePos, int color){
         try{
             ReachLine[] reachLines = new ReachLine[0]{};
-            //リーチ条件1 : XとY座標が同じライン
+            //リーチ条件1 : XとY座標が変化しないライン
             (int x, int z, int y)[] reachXY = candidatePos.GroupBy(item => new { PosX = item.x, PosY = item.y})
             .Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
-            reachLines = reachLines.Concat(MakeReachLineArray(reachXY, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachXY, color)).ToArray(); //Concat使う場合、代入が必要なので注意
+
+            //リーチ条件2 : ZとY座標が変化しないライン
+            (int x, int z, int y)[] reachZY = candidatePos.GroupBy(item => new { PosZ = item.z, PosY = item.y})
+            .Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachZY, color)).ToArray();
+
+            //リーチ条件3 : XとZ座標が同じライン
+            (int x, int z, int y)[] reachXZ = candidatePos.GroupBy(item => new { PosX = item.x, PosZ = item.z})
+            .Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachXZ, color)).ToArray();
+
+            //リーチ条件4 : X座標が変化せずYとZ座標が異なる(1ずつ上昇もしくは下降する)
+            //Z正方向に上昇するパターン
+            (int x, int z, int y)[] reachDiagonalX1 = candidatePos.Where(item => item.y == item.z)
+            .GroupBy(item => item.x).Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            //Z正方向に下降するパターン
+            (int x, int z, int y)[] reachDiagonalX2 = candidatePos.Where(item => (3 - item.y) == item.z)
+            .GroupBy(item => item.x).Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonalX1, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonalX2, color)).ToArray();
+
+            //リーチ条件5 : Z座標が変化せずXとY座標が異なる(1ずつ上昇もしくは下降する)
+            //X正方向に上昇するパターン
+            (int x, int z, int y)[] reachDiagonalZ1 = candidatePos.Where(item => item.x == item.y)
+            .GroupBy(item => item.z).Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            //X正方向に下降するパターン
+            (int x, int z, int y)[] reachDiagonalZ2 = candidatePos.Where(item => (3 - item.y) == item.x)
+            .GroupBy(item => item.z).Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonalZ1, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonalZ2, color)).ToArray();
+
+            //リーチ条件6 : Y座標が変化せずXとZ座標が異なる(1ずつ上昇もしくは下降する)
+            //XZ平面で右肩上がり
+            (int x, int z, int y)[] reachDiagonalY1 = candidatePos.Where(item => item.x == item.z)
+            .GroupBy(item => item.y).Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            //XZ平面で右肩下がり
+            (int x, int z, int y)[] reachDiagonalY2 = candidatePos.Where(item => (3 - item.z) == item.x)
+            .GroupBy(item => item.y).Where(item => item.Count() > 2).SelectMany(item => item).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonalY1, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonalY2, color)).ToArray();
+
+            //リーチ条件7 : X,Y,Z座標いずれも異なる(1ずつ上昇もしくは下降する)
+            //(3, 3, 3)へ向けて上昇
+            (int x, int z, int y)[] reachDiagonal1 = candidatePos.Where(item => (item.x == item.y) && (item.z == item.y))
+            .Select(item =>item).ToArray();
+            //(0, 0, 3)へ向けて上昇
+            (int x, int z, int y)[] reachDiagonal2 = candidatePos.Where(item => (item.x == (3 - item.y)) && (item.z == (3 - item.y)))
+            .Select(item =>item).ToArray();        
+            //(0, 3, 3)へ向けて上昇
+            (int x, int z, int y)[] reachDiagonal3 = candidatePos.Where(item => ((3 - item.x) == item.y) && (item.z == item.y))
+            .Select(item =>item).ToArray();        
+            //(3, 3, 0)へ向けて上昇
+            (int x, int z, int y)[] reachDiagonal4 = candidatePos.Where(item => (item.x == item.y) && ((3 - item.z) == item.y))
+            .Select(item =>item).ToArray();        
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonal1, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonal2, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonal3, color)).ToArray();
+            reachLines = reachLines.Concat(MakeReachLineArray(reachDiagonal4, color)).ToArray();
+
             return reachLines;
         }
         catch{
