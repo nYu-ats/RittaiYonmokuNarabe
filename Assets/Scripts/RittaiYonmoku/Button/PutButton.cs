@@ -5,7 +5,7 @@ using CommonConfig;
 
 public class PutButton : MonoBehaviour
 {
-    [SerializeField] Board board;
+    [SerializeField] BoardController boardController;
     //テスト用
     [SerializeField] PutPositionPanel putPositionPanel;
     [SerializeField] GameController gameController;
@@ -21,6 +21,6 @@ public class PutButton : MonoBehaviour
     }
 
     public void OnClicked(){
-        board.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
+        boardController.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
     }
 }

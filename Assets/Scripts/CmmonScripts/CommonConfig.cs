@@ -59,10 +59,10 @@ namespace CommonConfig
     {
         //基礎となるゲームルール
         private const string firstAttack = "White"; //白が先行
-        public static string FirstAttack{get {return firstAttack;}}
+        public static int FirstAttack{get {return 1;}}
 
         private const string secondAttack = "Black"; //黒が後攻
-        public static string SecondAttack{get {return secondAttack;}}
+        public static int SecondAttack{get {return 2;}}
 
         private const int totalGoNumber = 64; //碁の総数は64個
         public static int TotalGoNumber{get {return totalGoNumber;}}
@@ -82,5 +82,42 @@ namespace CommonConfig
 
         private const int goBlack = 2;
         public static int GoBlack{get {return goBlack;}}
+    }
+
+    public class NPCLevel
+    {
+        private const int easyLevel = 1;
+        public static int EasyLevel{get {return easyLevel;}}
+
+        private const int normalLevel = 2;
+        public static int NormalLevel{get {return normalLevel;}}
+
+        private const int hardLevel = 3;
+        public static int HardLevel{get {return hardLevel;}}
+
+    }
+
+    public class LinePattern
+    {
+        private const int pattern0 = 0; //単体の碁の状態
+        public static int Pattern0{get{return pattern0;}}
+        private const int pattern1 = 1; //条件1 : XとY座標が変化しないライン
+        public static int Pattern1{get{return pattern1;}}
+
+        private const int pattern2 = 2; //条件2 : ZとY座標が変化しないライン
+        public static int Pattern2{get{return pattern2;}}
+
+        private const int pattern3 = 3; //条件3 : XとZ座標が同じライン
+        public static int Pattern3{get{return pattern3;}}
+
+        private const int pattern4 = 4; //条件4 : X座標が変化せずYとZ座標が異なる(1ずつ上昇もしくは下降する)
+        public static int Pattern4{get{return pattern4;}}
+        private const int pattern5 = 5; //条件5 : Z座標が変化せずXとY座標が異なる(1ずつ上昇もしくは下降する)
+        public static int Pattern5{get{return pattern5;}}
+        private const int pattern6 = 6; //条件6 : Y座標が変化せずXとZ座標が異なる(1ずつ上昇もしくは下降する)
+        public static int Pattern6{get{return pattern6;}}
+        private const int pattern7 = 7; //条件7 : X,Y,Z座標いずれも異なる(1ずつ上昇もしくは下降する)
+        public static int Pattern7{get{return pattern7;}}
+
     }
 }

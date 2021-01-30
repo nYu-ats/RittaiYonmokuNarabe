@@ -6,8 +6,8 @@ public class BasePlayButton : MonoBehaviour
 {
     protected int loadPlayMode = 0;
     protected int gameRoom = 0;
-    protected string playerColor = "";
-    protected string rivalColor = "";
+    protected int playerColor = 0;
+    protected int rivalColor = 0;
 
     //ゲーム本体のシーンが読み込まれたときのプレイモードの設定をする
     //加えてゲームシーン->ホームシーンの時には呼び出す必要がないのでイベントハンドラーから消去しておく

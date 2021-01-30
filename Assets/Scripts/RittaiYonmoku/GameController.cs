@@ -8,10 +8,10 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] Button goPutButton;
     [SerializeField] Button giveUpButton;
-    [SerializeField] Board board;
+    [SerializeField] BoardController boardController;
     private int goNumber = GameRule.TotalGoNumber;
-    private string currentTurn;
-    public string CurrentTurn{get {return currentTurn;}}
+    private int currentTurn;
+    public int CurrentTurn{get {return currentTurn;}}
     private int playMode;
     public int PlayMode{
         set {playMode = value;}
@@ -23,20 +23,20 @@ public class GameController : MonoBehaviour
         get {return gameRoom;}
     }
 
-    private string player;
-    public string Player{
+    private int player;
+    public int Player{
         set {player = value;}
         get {return player;}
     }
 
-    private string rival;
-    public string Rival{
+    private int rival;
+    public int Rival{
         set {rival = value;}
         get {return rival;}
     }
 
     private void Start(){
-        board.boardUpdated += TurnChange;
+        boardController.boardUpdated += TurnChange;
         TurnSet(GameRule.FirstAttack); //ゲーム開始時のターンのセット
     }
 
@@ -52,7 +52,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void TurnSet(string nextTurn){
+    private void TurnSet(int nextTurn){
         currentTurn = nextTurn;
         if(currentTurn == player){
             //プレイヤーのターンであれば碁を置く操作とギブアップする操作をできるようにする

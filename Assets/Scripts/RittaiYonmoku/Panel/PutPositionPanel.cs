@@ -13,7 +13,7 @@ public class PutPositionPanel : MonoBehaviour
     [SerializeField] Image CurosrImg;
     [SerializeField] CameraMover cameraMover;
     [SerializeField] PutPositionButton[] putPositionButton;
-    [SerializeField] Board board;
+    [SerializeField] BoardController boardController;
     private (int x, int z) indexXZ = (0, 0);
     public (int x, int z) IndexXZ{get {return indexXZ;}} //置くボタンからアクセスするためのプロパティ
 
@@ -30,7 +30,7 @@ public class PutPositionPanel : MonoBehaviour
     }
 
     public void SelectedPositionUpdate(int indexX, int indexZ){
-        if(board.CheckCanPut(indexX, indexZ) == BoardStatus.CanNotPut){
+        if(boardController.CheckCanPut(indexX, indexZ) == BoardStatus.CanNotPut){
             //すでに4つの碁が置かれている棒には移動できないようにする
             return;
         }
