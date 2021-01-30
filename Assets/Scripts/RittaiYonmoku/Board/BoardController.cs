@@ -54,14 +54,10 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
     public BoardUpdateEventHandler boardUpdated = () => {}; 
 
     public void AddGo(int xIndex, int zIndex, int addColor){
-        int canPutIndex = CheckCanPut(xIndex, zIndex);
-        if(canPutIndex != BoardStatus.CanNotPut){
-            board.boardStatusArray[canPutIndex] = addColor;
+        int canPutIndexY = CheckCanPut(xIndex, zIndex);
+        if(canPutIndexY != BoardStatus.CanNotPut){
+            board.boardStatusArray[Array.IndexOf(board.posArray, (xIndex, zIndex, canPutIndexY))] = addColor;
             goGenerator.PutGo(xIndex, zIndex, addColor);
-            //Debug.Log(boardStatusArray[canPutIndex]);
-            //Debug.Log(posArray[canPutIndex]);
-            if(HasLines(3) != null){
-            }
             boardUpdated();
         }
     }
@@ -71,9 +67,8 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
         try{
             int[] indexArray = board.posArray.Select((item, index) => new {Index = index, Value = item})
             .Where(item => item.Value.x == xIndex & item.Value.z == zIndex).Select(item => item.Index).ToArray();
-
             return indexArray.Where(item => board.boardStatusArray[item] == BoardStatus.Vacant)
-            .Select(item => item).First(); //1次元に平坦化したボード状態配列boardStatusArrayのインデックスを返す
+            .Select(item => board.posArray[item].y).First(); //1次元に平坦化したボード状態配列boardStatusArrayのインデックスを返す
         }
         catch{
             //すでに4つの碁が置かれている場合
@@ -228,7 +223,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int thisIndexX = threeGoSituation.Positions[0].x;
             int thisIndexY = threeGoSituation.Positions[0].y;
             int? tmpIndexZ = lineIndex.Select((index, item) => new {IndexY = CheckCanPut(thisIndexX, index), IndexZ = item})
-            .Where(item => board.posArray[item.IndexY].y <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
+            .Where(item => item.IndexY <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
             .Select(item => item.IndexZ).FirstOrDefault(); //対象ラインの中にチェックメイトになりうる空きポジションがなければnullを返す
             if(tmpIndexZ != null){
                 threeGoSituation.CheckMatePos = (x: thisIndexX, z: (int)tmpIndexZ, y: thisIndexY);
@@ -238,7 +233,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int thisIndexZ = threeGoSituation.Positions[0].z;
             int thisIndexY = threeGoSituation.Positions[0].y;
             int? tmpIndexX = lineIndex.Select((index, item) => new {IndexY = CheckCanPut(index, thisIndexZ), IndexX = item})
-            .Where(item => board.posArray[item.IndexY].y <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
+            .Where(item => item.IndexY <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
             .Select(item => item.IndexX).FirstOrDefault(); //対象ラインの中にチェックメイトになりうる空きポジションがなければnullを返す
             if(tmpIndexX != null){
                 threeGoSituation.CheckMatePos = (x: (int)tmpIndexX, z: thisIndexZ, y: thisIndexY);
@@ -248,7 +243,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int thisIndexX = threeGoSituation.Positions[0].x;
             int thisIndexZ = threeGoSituation.Positions[0].z;
             int tmpIndexY = CheckCanPut(thisIndexX, thisIndexZ);
-            threeGoSituation.CheckMatePos = (x: thisIndexX, z:thisIndexZ, y: board.posArray[tmpIndexY].y);
+            threeGoSituation.CheckMatePos = (x: thisIndexX, z:thisIndexZ, y: tmpIndexY);
         }else if(threeGoSituation.Pattern == LinePattern.Pattern4){
             //3連の碁の座標が持っていないZとY座標を抽出、碁が置けるかどうか確認する
             int thisIndexX = threeGoSituation.Positions[0].x;
@@ -258,7 +253,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int? notHaveIndexY = lineIndex.Where(item => !hasthisIndexY.Contains(item)).Select(item => item).FirstOrDefault();
             if(notHaveIndexY != null & notHaveIndexZ != null){
                 int canPutIndexY = CheckCanPut(thisIndexX, (int)notHaveIndexZ);
-                if(canPutIndexY != BoardStatus.CanNotPut | board.posArray[canPutIndexY].y <= notHaveIndexY){
+                if(canPutIndexY != BoardStatus.CanNotPut | canPutIndexY <= notHaveIndexY){
                     threeGoSituation.CheckMatePos = (x: thisIndexX, z: (int)notHaveIndexZ, y: (int)notHaveIndexY);
                     }
                 }
@@ -271,7 +266,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int? notHaveIndexX = lineIndex.Where(item => !hasthisIndexX.Contains(item)).Select(item => item).FirstOrDefault();
             if(notHaveIndexY != null & notHaveIndexX != null){
                 int canPutIndexY = CheckCanPut((int)notHaveIndexX, thisIndexZ);
-                if(canPutIndexY != BoardStatus.CanNotPut | board.posArray[canPutIndexY].y <= notHaveIndexY){
+                if(canPutIndexY != BoardStatus.CanNotPut | canPutIndexY <= notHaveIndexY){
                     threeGoSituation.CheckMatePos = (x: (int)notHaveIndexX, z: thisIndexZ, y: (int)notHaveIndexY);
                     }
                 }
@@ -284,7 +279,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int? notHaveIndexZ = lineIndex.Where(item => !hasthisIndexZ.Contains(item)).Select(item => item).FirstOrDefault();
             if(notHaveIndexX != null & notHaveIndexZ != null){
                 int canPutIndexY = CheckCanPut((int)notHaveIndexX, (int)notHaveIndexZ);
-                if(canPutIndexY != BoardStatus.CanNotPut | board.posArray[canPutIndexY].y <= thisIndexY){
+                if(canPutIndexY != BoardStatus.CanNotPut | canPutIndexY <= thisIndexY){
                     threeGoSituation.CheckMatePos = (x: (int)notHaveIndexX, z: (int)notHaveIndexZ, y: thisIndexY);
                     }
                 } 
@@ -298,7 +293,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int? notHaveIndexY = lineIndex.Where(item => !hasthisIndexY.Contains(item)).Select(item => item).FirstOrDefault();
             if(notHaveIndexX != null & notHaveIndexZ != null & notHaveIndexY != null){
                 int canPutIndexY = CheckCanPut((int)notHaveIndexX, (int)notHaveIndexZ);
-                if(canPutIndexY != BoardStatus.CanNotPut | board.posArray[canPutIndexY].y <= (int)notHaveIndexY){
+                if(canPutIndexY != BoardStatus.CanNotPut |canPutIndexY <= (int)notHaveIndexY){
                     threeGoSituation.CheckMatePos = (x: (int)notHaveIndexX, z: (int)notHaveIndexZ, y: (int)notHaveIndexY);
                     Debug.Log(threeGoSituation.CheckMatePos);
                     }
