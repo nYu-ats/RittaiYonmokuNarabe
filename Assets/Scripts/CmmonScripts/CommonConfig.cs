@@ -97,6 +97,18 @@ namespace CommonConfig
 
     }
 
+    public class GamePhaseJudge
+    {
+        private static (int x, int z, int limit)[] earlyPhasePoint
+        = new (int x, int z, int limit)[8]{(x:0, z:0, limit:0), (x:0, z:3, limit:0), (x:3, z:0, limit:0), (x:3, z:3, limit:0),
+                                           (x:1, z:1, limit:2), (x:1, z:2, limit:2), (x:2, z:1, limit:2), (x:2, z:2, limit:2)};
+        public static (int x, int z, int limit)[] EarlyPhasePoint
+        {get {return earlyPhasePoint;}}
+
+        private const int middlePhaseGoLimit = 32;
+        public static int MiddlePhaseGoLimit{get {return middlePhaseGoLimit;}}
+    }
+
     public class LinePattern
     {
         private const int pattern0 = 0; //単体の碁の状態

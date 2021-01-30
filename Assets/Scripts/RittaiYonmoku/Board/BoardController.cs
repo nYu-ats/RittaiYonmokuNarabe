@@ -68,7 +68,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int[] indexArray = board.posArray.Select((item, index) => new {Index = index, Value = item})
             .Where(item => item.Value.x == xIndex & item.Value.z == zIndex).Select(item => item.Index).ToArray();
             return indexArray.Where(item => board.boardStatusArray[item] == BoardStatus.Vacant)
-            .Select(item => board.posArray[item].y).First(); //1次元に平坦化したボード状態配列boardStatusArrayのインデックスを返す
+            .Select(item => board.posArray[item].y).First();
         }
         catch{
             //すでに4つの碁が置かれている場合
@@ -295,7 +295,6 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
                 int canPutIndexY = CheckCanPut((int)notHaveIndexX, (int)notHaveIndexZ);
                 if(canPutIndexY != BoardStatus.CanNotPut |canPutIndexY <= (int)notHaveIndexY){
                     threeGoSituation.CheckMatePos = (x: (int)notHaveIndexX, z: (int)notHaveIndexZ, y: (int)notHaveIndexY);
-                    Debug.Log(threeGoSituation.CheckMatePos);
                     }
                 }
         }
