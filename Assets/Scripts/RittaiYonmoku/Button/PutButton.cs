@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using CommonConfig;
 
 public class PutButton : MonoBehaviour
@@ -22,5 +23,6 @@ public class PutButton : MonoBehaviour
 
     public void OnClicked(){
         boardController.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
+        this.GetComponent<Button>().enabled = false;
     }
 }
