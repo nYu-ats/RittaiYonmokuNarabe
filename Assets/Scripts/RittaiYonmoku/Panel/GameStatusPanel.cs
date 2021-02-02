@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 public class GameStatusPanel : MonoBehaviour
 {
     [SerializeField] GameController gameController;
-    [SerializeField] Image checkMateUI;
+    [SerializeField] GameObject checkMateUI;
     [SerializeField] GameObject gameResultPanel;
     [SerializeField] int checkMateDisplayTime = 3000;
     void Start()
@@ -16,10 +16,10 @@ public class GameStatusPanel : MonoBehaviour
     }
 
     async private void DisplayCheckMate(){
-        checkMateUI.enabled = true;
+        checkMateUI.SetActive(true);
         await UniTask.Delay(checkMateDisplayTime)
         .ContinueWith(() => gameResultPanel.SetActive(true)); //ゲームリザルトを表示するまで数秒間をあける
-        gameController.checkMateEvent -= DisplayCheckMate;
+        //gameController.checkMateEvent -= DisplayCheckMate;
     }
 
 }

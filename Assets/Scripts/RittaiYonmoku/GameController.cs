@@ -64,7 +64,7 @@ public class GameController : MonoBehaviour
             giveUpButton.enabled = true;
         }
         else{
-            //対戦相手のターンであれば碁を置けなくしてギブアップもできなくする
+            //対戦相手のターンであればギブアップできなくする
             giveUpButton.enabled = false;
         }
     }
