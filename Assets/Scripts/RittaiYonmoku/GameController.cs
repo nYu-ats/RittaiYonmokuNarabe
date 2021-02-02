@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     [SerializeField] Button giveUpButton;
     [SerializeField] BoardController boardController;
     private int goNumber = GameRule.TotalGoNumber;
+    public int GoNumber{get {return goNumber;}}
     private int currentTurn;
     public int CurrentTurn{get {return currentTurn;}}
     private int playMode;
@@ -35,7 +36,10 @@ public class GameController : MonoBehaviour
         get {return rival;}
     }
 
+    public delegate void CheckMateEventHandler();
+    public event CheckMateEventHandler checkMateEvent = () => {};
     private void Start(){
+        boardController.boardUpdated += ConfirmCheckMate; //ターンを切り替える前にチェックメイトの確認をする
         boardController.boardUpdated += TurnChange;
         TurnSet(GameRule.FirstAttack); //ゲーム開始時のターンのセット
     }
@@ -63,6 +67,14 @@ public class GameController : MonoBehaviour
             //対戦相手のターンであれば碁を置けなくしてギブアップもできなくする
             goPutButton.enabled = false;
             giveUpButton.enabled = false;
+        }
+    }
+
+    private void ConfirmCheckMate(){
+        GoSituations[] checkMateArray = boardController.HasLines(4);
+        if(checkMateArray != null){
+            boardController.boardUpdated -= TurnChange; //チェックメイトが発生した場合はターンの切替を行わないようにする
+            checkMateEvent();
         }
     }
 }

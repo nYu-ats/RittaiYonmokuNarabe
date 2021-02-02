@@ -51,8 +51,6 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
     [SerializeField] GoGenerator goGenerator;
     public delegate void BoardUpdateEventHandler();
     public event BoardUpdateEventHandler boardUpdated = () => {};
-    public delegate void CheckMateEventHandler();
-    public event CheckMateEventHandler checkMate = () => {};
 
     public void AddGo(int xIndex, int zIndex, int addColor){
         int canPutIndexY = CheckCanPut(xIndex, zIndex);
