@@ -24,6 +24,7 @@ public class TimeCountPanel : MonoBehaviour
             time -= Time.deltaTime;
             timeCountText.text = String.Format("Time : {0:00}", Mathf.Floor(time));
             if(time <= 0){
+                //時間切れになったらランダムで碁を置く
                 RandomPut();
             }
         }

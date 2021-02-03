@@ -13,7 +13,9 @@ public class GameController : MonoBehaviour
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
     private int currentTurn;
-    public int CurrentTurn{get {return currentTurn;}}
+    public int CurrentTurn{
+        set {currentTurn = value;}
+        get {return currentTurn;}}
     private int playMode;
     public int PlayMode{
         set {playMode = value;}
