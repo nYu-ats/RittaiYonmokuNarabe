@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour
     [SerializeField] Button goPutButton;
     [SerializeField] Button giveUpButton;
     [SerializeField] BoardController boardController;
+    [SerializeField] TimeCountPanel timeCount;
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
     private int currentTurn;
@@ -72,6 +73,7 @@ public class GameController : MonoBehaviour
     private void ConfirmCheckMate(){
         GoSituations[] checkMateArray = boardController.HasLines(4);
         if(checkMateArray != null){
+            timeCount.SwitchTimeCountStatus(false);
             boardController.boardUpdated -= TurnChange; //チェックメイトが発生した場合はターンの切替を行わないようにする
             checkMateEvent();
         }
