@@ -30,7 +30,7 @@ public class TouchReader : MonoBehaviour
         }
         else if(touchPoint1.phase == TouchPhase.Moved & touchPoint2.phase == TouchPhase.Moved){
             float tmpDist = Vector2.Distance(touchPoint1.position, touchPoint2.position);
-            float changePercentage = tmpDist / baseDist;
+            float changePercentage = baseDist / tmpDist;
             cameraMover.PinchInOut(changePercentage);
             baseDist = tmpDist;
         }
