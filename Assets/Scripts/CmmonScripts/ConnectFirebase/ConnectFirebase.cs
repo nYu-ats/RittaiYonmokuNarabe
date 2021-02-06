@@ -141,7 +141,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
         string existRoomNumber = null;
             //昇順に並べ替えて最初のレコードを取得してくる
             await reference.Child(GetKey.MatchingRoomKey).OrderByKey().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
-                if(task.Result.Exists){
+                if(task.Result.GetRawJsonValue() != null){
                     existRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が固定ではなく、jsonutilityで変換できないので文字列の切り出しでgameroomの取り出しをする
                 }
             });
@@ -187,7 +187,6 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
             }).Timeout(TimeSpan.FromSeconds(30));
         }
         rivalName = rivalName.Trim('\"');
-        Debug.Log(rivalName);
         return rivalName;
     }
 
