@@ -98,7 +98,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
     }
 
     public bool matchingFlag = false; //マッチング待機するためのフラグ
-    public string gameRoomNumber = "";
+    public string gameRoomNumber = null;
     //マッチング処理
     public async UniTask<int> Matching(){
         try{
@@ -106,20 +106,20 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
                 gameRoomNumber = await CheckMatchingRoom();
             }).ContinueWith(async () => {
                 if(gameRoomNumber != null){
-                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(true);
-                return int.Parse(gameRoomNumber);
-            }
-            else{
-                gameRoomNumber = MakeMathingRoomNumber(); //ゲームルームの番号を発行する
-                //値falseで初期セットしておき、trueになるまで待機する
-                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(false);
-                reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).ValueChanged += ListenMatchingStatus;
-                await UniTask.WaitUntil(() => matchingFlag);
+                    await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(true);
+                    return int.Parse(gameRoomNumber);
+                }
+                else{
+                    gameRoomNumber = MakeMathingRoomNumber(); //ゲームルームの番号を発行する
+                    //値falseで初期セットしておき、trueになるまで待機する
+                    await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(false);
+                    reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).ValueChanged += ListenMatchingStatus;
+                    await UniTask.WaitUntil(() => matchingFlag);
 
-                //マッチングが完了次第、マッチングルームからゲームルーム番号を削除して値を返す
-                await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(null); //マッチング完了後はmatchinroomからキーを削除
-                return int.Parse(gameRoomNumber);
-            }
+                    //マッチングが完了次第、マッチングルームからゲームルーム番号を削除して値を返す
+                    await reference.Child(GetKey.MatchingRoomKey).Child(gameRoomNumber).SetValueAsync(null); //マッチング完了後はmatchinroomからキーを削除
+                    return int.Parse(gameRoomNumber);
+                }
             });
         }
         catch {
@@ -130,18 +130,19 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
 
     //待機ユーザーがいるかどうかの確認
     public async UniTask<string> CheckMatchingRoom(){
+        string roomNumber = null;
         try{
             //昇順に並べ替えて最初のレコードを取得してくる
             //下記返却値
             //・待機ユーザーがいない場合->null
             //・待機ユーザーがいる場合->ルーム番号
-            return await reference.Child(GetKey.MatchingRoomKey).OrderByValue().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
-                return task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので文字列の切り出しでgameroomの取り出しをする
+            await reference.Child(GetKey.MatchingRoomKey).OrderByKey().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
+                roomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が確定しない構造でjsonutilityで変換できないので文字列の切り出しでgameroomの取り出しをする
             });
         }
         catch {
-            return null;
-        }          
+        }
+        return roomNumber;      
     }
 
     //作成した待機ルームの更新(マッチング)を待つ
@@ -157,10 +158,10 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
     }
 
     //現時刻からルーム番号を生成するメソッド
-    //極力かぶりが発生しないようミリ秒単位まで含めて、分、秒、ミリ秒の値を繋げて番号を作成する
+    //極力かぶりが発生しないようミリ秒単位まで含めて時間、分、秒、ミリ秒の値を繋げて番号を作成する
     public string MakeMathingRoomNumber(){
         DateTime dateTime = DateTime.Now;
-        string gameRoomString = String.Format("{0: HHmmssfff}", dateTime);
+        string gameRoomString = String.Format("{0:HHmmssff}", dateTime);
         return gameRoomString;
     }
 }
