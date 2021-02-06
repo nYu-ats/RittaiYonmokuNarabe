@@ -43,6 +43,12 @@ namespace CommonConfig
             //ゲーム画面で使っているタグ
             private const string gameContoroller = "GameController";
             public static string GameController{get {return gameContoroller;}}
+
+            private const string whiteGo = "WhiteGo";
+            public static string WhiteGo{get {return whiteGo;}}
+            private const string blackGo = "BlackGo";
+            public static string BlackGo{get {return blackGo;}}
+
         }
     }
 
