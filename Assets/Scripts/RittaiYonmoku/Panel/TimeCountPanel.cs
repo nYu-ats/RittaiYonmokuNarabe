@@ -11,7 +11,8 @@ public class TimeCountPanel : MonoBehaviour
     [SerializeField] GameController gameController;
     private float time;
     private float timeLimit = 90.0f;
-    private bool doTimeCount = true;
+    private bool doTimeCount = false; //GameControlerでtrueにセットしてカウントを開始
+    public bool DoTimeCount{set {doTimeCount = value;}}
 
     void Start(){
         boardController.boardUpdated += ResetTimeCount;

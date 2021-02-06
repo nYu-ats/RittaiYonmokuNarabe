@@ -24,6 +24,14 @@ namespace CommonConfig
         public static string VolumeKey{get {return volumeKey;}}
     }
 
+    public class MatchingPattern
+    {
+        private const int createRoom = 1;
+        public static int CreateRoom{get {return createRoom;}}
+        private const int enterRoom = 2;
+        public static int EnterRoom{get {return enterRoom;}}
+    }
+
     public class AudioConfig
     {
         //オーディオ周りの設定

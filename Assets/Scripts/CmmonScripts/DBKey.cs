@@ -13,5 +13,7 @@ namespace FirebaseChildKey
         public static string RecordKey{get{return recordKey;}}
         private const string matchingRoomKey = "matching";
         public static string MatchingRoomKey{get{return matchingRoomKey;}}
+        private const string gamePlayer = "player";
+        public static string GamePlayer{get {return gamePlayer;}}
     }
 }

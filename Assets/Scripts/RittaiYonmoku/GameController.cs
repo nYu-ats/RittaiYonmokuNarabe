@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 using CommonConfig;
-
+using System;
 public class GameController : MonoBehaviour
 {
     [SerializeField] Button goPutButton;
     [SerializeField] Button giveUpButton;
     [SerializeField] BoardController boardController;
     [SerializeField] TimeCountPanel timeCount;
+    [SerializeField] GameObject connectFailedPanel;
+    [SerializeField] GameObject npc;
+    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] UserNamePanel userNamePanel;
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
     private int currentTurn;
@@ -39,12 +44,34 @@ public class GameController : MonoBehaviour
         get {return rival;}
     }
 
+    private string rivalName = "";
+
     public delegate void CheckMateEventHandler();
     public event CheckMateEventHandler checkMateEvent = () => {};
-    private void Start(){
-        boardController.boardUpdated += ConfirmCheckMate; //ターンを切り替える前にチェックメイトの確認をする
+    private async void Start(){
+        await SetUpGame();
+        userNamePanel.SetPlayerName(player, rivalName);
+        boardController.boardUpdated += ConfirmCheckMate;
         boardController.boardUpdated += TurnChange;
         TurnSet(GameRule.FirstAttack); //ゲーム開始時のターンのセット
+        timeCount.DoTimeCount = true;
+    }
+
+    private async UniTask SetUpGame(){
+        if(playMode == 1){
+            npc.SetActive(true);
+            rivalName = "NPC";
+        }
+        else{
+            npc.SetActive(false);
+            await connectFirebase.SetGameRoom(gameRoom, player);
+            try{
+                rivalName = await connectFirebase.GetRivalName(gameRoom, rival);
+            }
+            catch (TimeoutException){
+                connectFailedPanel.SetActive(true);
+            }
+        }
     }
 
     private void TurnChange(){
