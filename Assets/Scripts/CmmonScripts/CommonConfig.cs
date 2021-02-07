@@ -80,6 +80,10 @@ namespace CommonConfig
 
         private const int totalGoNumber = 64; //碁の総数は64個
         public static int TotalGoNumber{get {return totalGoNumber;}}
+        private const int soloPlayMode = 1;
+        public static int SoloPlayMode{get {return soloPlayMode;}}
+        private const int multiPlayMode = 2;
+        public static int MultiPlayMode{get {return multiPlayMode;}}
     }
 
     public class BoardStatus

@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using CommonConfig;
+using Cysharp.Threading.Tasks;
 
 interface IAddGo{
     //碁を追加するためのメソッド
@@ -49,6 +50,8 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
 {
     [SerializeField] Board board;
     [SerializeField] GoGenerator goGenerator;
+    private (int x, int z, int y, int color) lastUpdate;
+    public (int x, int z, int y, int color) LastUpdate{get {return lastUpdate;}}
     public delegate void BoardUpdateEventHandler();
     public event BoardUpdateEventHandler boardUpdated = () => {};
 
@@ -57,6 +60,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
         if(canPutIndexY != BoardStatus.CanNotPut){
             board.boardStatusArray[Array.IndexOf(board.posArray, (xIndex, zIndex, canPutIndexY))] = addColor;
             goGenerator.PutGo(xIndex, zIndex, addColor);
+            lastUpdate = (xIndex, zIndex, canPutIndexY, addColor);
             boardUpdated();
         }
     }

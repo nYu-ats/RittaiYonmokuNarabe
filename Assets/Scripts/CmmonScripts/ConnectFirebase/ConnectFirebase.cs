@@ -6,6 +6,7 @@ using Firebase.Database;
 using FirebaseChildKey;
 using CustomException;
 using CommonConfig;
+using System.Text.RegularExpressions;
 
 //各処理をうまく分離して運用できる方法を検討
 //現状1つのファイルの1つのクラスに処理をまとめる or 各処理ごとにGameObjectを配置するかの2案
@@ -37,6 +38,14 @@ interface IGetRivalName{
     UniTask<string> GetRivalName(int gameRoom, int rival);
 }
 
+interface IAddGoFirebase{
+    UniTask AddGoFirebase();
+}
+
+interface ISetGo{
+    UniTask SetGo((int x, int z, int y, int color) updateInfo);
+}
+
 public class GameRecord
 {
     public int win;
@@ -48,7 +57,7 @@ public class GameRecord
     }
 }
 
-public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName
+public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName, ISetGo
 {
     DatabaseReference reference;
     void Start(){
@@ -144,7 +153,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
                     existRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が固定ではなく、jsonutilityで変換できないので文字列の切り出しでgameroomの取り出しをする
                 }
             });
-        return existRoomNumber;      
+        return null; //テストのため一旦null   
     }
 
     //作成した待機ルームの更新(マッチング)を待つ
@@ -199,6 +208,45 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
         if(args.Snapshot.GetRawJsonValue() != null){
             rivalName = args.Snapshot.GetRawJsonValue();
             gameRoomCrated = true;
+        }
+    }
+
+    [SerializeField] GameController gameController;
+    [SerializeField] BoardController boardController;
+    private bool gameUpdated = false;
+    private (int x, int z, int y, int color) rivalAction;
+
+    public async UniTask SetGo((int x, int z, int y, int color) updateInfo){
+        string setKey = updateInfo.x.ToString() + updateInfo.z.ToString() + updateInfo.y.ToString();
+        await reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).Child(setKey).SetValueAsync(updateInfo.color.ToString());
+    }
+
+    public async UniTask<(int x, int z, int y, int color)> WaitRivalAction(){
+        Debug.Log("liseten start");
+        reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged += ListenGameStatusUpdate;
+            await UniTask.WaitUntil(() => gameUpdated).ContinueWith(() => {
+                reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged -= ListenGameStatusUpdate;
+            }).Timeout(TimeSpan.FromSeconds(90));
+        gameUpdated = false;
+        return rivalAction;
+    } 
+
+    private void ListenGameStatusUpdate(object sender, ValueChangedEventArgs args){
+        if(args.DatabaseError != null){
+            //エラーが発生した場合は読み取りを終える
+            return;
+        }
+        if(args.Snapshot.GetRawJsonValue() != null){
+            MatchCollection positions = Regex.Matches(args.Snapshot.GetRawJsonValue().ToString(), @"\d{3}");
+            foreach(Match str in positions){
+                int x = int.Parse(str.Value[0].ToString());
+                int z = int.Parse(str.Value[1].ToString());
+                int y = int.Parse(str.Value[2].ToString());
+                if(boardController.CheckCanPut(x, z) == y){
+                    rivalAction = (x, z, y, gameController.Rival);
+                    gameUpdated = true;
+                }
+            }
         }
     }
 }
