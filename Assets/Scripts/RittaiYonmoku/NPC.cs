@@ -32,7 +32,7 @@ public class NPC : MonoBehaviour
     async void Update(){
         if(myColor == gameController.CurrentTurn & !thinking){
             thinking = true;
-            await UniTask.Delay(1500); //碁を置くのが速すぎると、1手前に置いた碁と衝突してしまうため少し待機
+            await UniTask.Delay(1500); //碁を置くのが速すぎると、1手前に置いた碁と衝突してしまうため少し待機させる
             if(phaseJudgePoint.Any(item => boardController.CheckCanPut(item.x, item.z) <= item.limit 
                 & boardController.CheckCanPut(item.x, item.z) != BoardStatus.CanNotPut)){
                     //主要な位置がすべて埋まっていない間を序盤と判断する
@@ -50,6 +50,9 @@ public class NPC : MonoBehaviour
     }
 }
 
+//NPCの挙動は序盤/中盤/終盤と局面に関係ない共通処理を切り替えるようにする
+//NPCクラスで局面を判断して、NPCBehaviorクラスの処理を呼び出すようにする
+//NPCBehaviorの処理は序盤/中盤/終盤/共通処理クラスの処理を組み合わせて作る
 public class NPCBehavior
 {
     public delegate void NPCAction(BoardController boardController, int myColor, int rivalColor);

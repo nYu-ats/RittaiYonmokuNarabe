@@ -23,6 +23,8 @@ public class PutButton : MonoBehaviour
 
     public void OnClicked(){
         boardController.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
+        //連続してボタンプッシュされるのを防ぐため初回プッシュ時にfalseにする
+        //自分のターンが回ってきたときにはGameControllerからtrueにされる
         this.GetComponent<Button>().enabled = false;
     }
 }

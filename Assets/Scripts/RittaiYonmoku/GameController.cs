@@ -51,7 +51,7 @@ public class GameController : MonoBehaviour
     private async void Start(){
         await SetUpGame();
         userNamePanel.SetPlayerName(player, rivalName);
-        boardController.boardUpdated += ConfirmCheckMate;
+        //boardController.boardUpdated += ConfirmCheckMate;
         boardController.boardUpdated += TurnChange;
         TurnSet(GameRule.FirstAttack); //ゲーム開始時のターンのセット
         timeCount.DoTimeCount = true;
@@ -75,15 +75,17 @@ public class GameController : MonoBehaviour
     }
 
     private void TurnChange(){
-        goNumber -= 1;
-        if(goNumber % 2 == 0){
-            //碁の数が偶数の場合は先行の白の手番
-            TurnSet(GameRule.FirstAttack);
-        }
-        else{
-            //碁の数が奇数の場合は後攻の黒の手番
-            TurnSet(GameRule.SecondAttack);
-        }
+        if(!ConfirmCheckMate()){
+            goNumber -= 1;
+            if(goNumber % 2 == 0){
+                //碁の数が偶数の場合は先行の白の手番
+                TurnSet(GameRule.FirstAttack);
+            }
+            else{
+                //碁の数が奇数の場合は後攻の黒の手番
+                TurnSet(GameRule.SecondAttack);
+            }
+        };
     }
 
     private void TurnSet(int nextTurn){
@@ -99,12 +101,20 @@ public class GameController : MonoBehaviour
         }
     }
 
-    private void ConfirmCheckMate(){
+    private bool ConfirmCheckMate(){
+        //event handlerへ登録する方式だとTurnChangeとの実行順が保証できず
+        //先にTurnChangeでcurrentTurnが更新されてしまう恐れがあるため
+        //TurnChangeの中でチェックメイトの判定を行い、続く処理を分岐させるようにする
         GoSituations[] checkMateArray = boardController.HasLines(4);
         if(checkMateArray != null){
             timeCount.SwitchTimeCountStatus(false);
             boardController.boardUpdated -= TurnChange; //チェックメイトが発生した場合はターンの切替を行わないようにする
+            npc.SetActive(false); //currentTurnが相手の状態なので、余計な碁が置かれないためdisactiveにする
             checkMateEvent();
+            return true;
+        }
+        else{
+            return false;
         }
     }
 }

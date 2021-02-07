@@ -48,7 +48,6 @@ public class GameRecord
     }
 }
 
-//
 public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName
 {
     DatabaseReference reference;

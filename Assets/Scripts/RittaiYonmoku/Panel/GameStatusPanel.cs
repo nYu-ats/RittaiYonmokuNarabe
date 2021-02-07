@@ -19,7 +19,7 @@ public class GameStatusPanel : MonoBehaviour
         checkMateUI.SetActive(true);
         await UniTask.Delay(checkMateDisplayTime)
         .ContinueWith(() => gameResultPanel.SetActive(true)); //ゲームリザルトを表示するまで数秒間をあける
-        //gameController.checkMateEvent -= DisplayCheckMate;
+        gameController.checkMateEvent -= DisplayCheckMate;
     }
 
 }
