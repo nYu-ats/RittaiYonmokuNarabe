@@ -733,10 +733,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: 
+  cloudProjectId: f4984a62-7aac-45d8-8162-276d99569ebd
   framebufferDepthMemorylessMode: 0
-  projectName: EffectsExamples
-  organizationId: 
+  projectName: RittaiYonmoku
+  organizationId: nyuats
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
