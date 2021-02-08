@@ -46,6 +46,7 @@ public class GameController : MonoBehaviour
     }
 
     private string rivalName = "";
+    public string RivalName{get {return rivalName;}}
 
     public delegate void CheckMateEventHandler();
     public event CheckMateEventHandler checkMateEvent = () => {};

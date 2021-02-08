@@ -3,22 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
+using Cysharp.Threading.Tasks;
 
 public class GameResultPanel : MonoBehaviour
 {
     [SerializeField] Text winnerText;
     [SerializeField] Text numberOfMove;
     [SerializeField] GameController gameController;
-    void Start()
+    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] Button ReturnToHomeButton;
+    async void Start()
     {
         int winner = gameController.CurrentTurn;
         int restGoNumber = gameController.GoNumber;
-        if(winner == BoardStatus.GoWhite){
-            winnerText.text = "白の勝利!!";
+        string player = PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey);
+        GameRecord currentRecord = null;
+        if(gameController.PlayMode == GameRule.MultiPlayMode){
+            await UniTask.Run(async () => {
+            currentRecord = await connectFirebase.GetRecord(player);
+            });
         }
+
+        if(winner == gameController.Player){
+            winnerText.text = player + "の勝利!!";
+            if(gameController.PlayMode == GameRule.MultiPlayMode){
+                    await connectFirebase.SetRecord(player, currentRecord.win + 1, currentRecord.lose);
+                }
+            }
         else{
-            winnerText.text = "黒の勝利!!";
+            winnerText.text = gameController.RivalName + "の勝利!!";
+            if(gameController.PlayMode == GameRule.MultiPlayMode){
+                    await connectFirebase.SetRecord(player, currentRecord.win, currentRecord.lose + 1);
+                }
         }
         numberOfMove.text = (GameRule.TotalGoNumber - restGoNumber).ToString();
+        ReturnToHomeButton.enabled = true; //全てのリザルト処理が終わった段階でホームへ戻れるようにする
     }
 }
