@@ -382,7 +382,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 176477537}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -871,12 +871,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 294701237}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e67770711f60634f9a1400ea7f41d0b, type: 3}
+  m_Script: {fileID: 11500000, guid: 93dc419021d2af349af1ceed3c1b9775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameResultPanel: {fileID: 828913613}
-  giveUpConfirmPanel: {fileID: 847140969}
-  gameController: {fileID: 1703375494}
 --- !u!114 &294701240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -977,8 +974,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 344092252}
+  - component: {fileID: 344092253}
   m_Layer: 0
-  m_Name: Rival
+  m_Name: SyncBoardStatus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -998,6 +996,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &344092253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344092251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5027d96f243a16640ae800ba492effc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boardController: {fileID: 713595363}
+  gameController: {fileID: 1703375494}
+  connectFirebase: {fileID: 1079850346}
+  gameResultPanel: {fileID: 828913613}
+  timeCountPanel: {fileID: 615787960}
 --- !u!1001 &360762094
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2723,6 +2738,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   board: {fileID: 1723567004}
   goGenerator: {fileID: 1804921272}
+  timeCountPanel: {fileID: 615787960}
+  gameController: {fileID: 1703375494}
 --- !u!4 &713595364
 Transform:
   m_ObjectHideFlags: 0
@@ -3130,6 +3147,8 @@ MonoBehaviour:
   winnerText: {fileID: 395647987}
   numberOfMove: {fileID: 1506837934}
   gameController: {fileID: 1703375494}
+  connectFirebase: {fileID: 1079850346}
+  ReturnToHomeButton: {fileID: 176477540}
 --- !u!114 &828913616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3454,7 +3473,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 935415692}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
@@ -3999,6 +4018,7 @@ MonoBehaviour:
   gameResultPanel: {fileID: 828913613}
   giveUpConfirmPanel: {fileID: 906712330}
   gameController: {fileID: 1703375494}
+  syncBoardStatus: {fileID: 344092253}
 --- !u!1 &1079850345
 GameObject:
   m_ObjectHideFlags: 0
@@ -4030,6 +4050,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   matchingFlag: 0
   gameRoomNumber: 
+  gameController: {fileID: 1703375494}
+  boardController: {fileID: 713595363}
 --- !u!4 &1079850347
 Transform:
   m_ObjectHideFlags: 0
@@ -6101,7 +6123,8 @@ MonoBehaviour:
   timeCount: {fileID: 615787960}
   connectFailedPanel: {fileID: 847140969}
   npc: {fileID: 1852950269}
-  connectFirebase: {fileID: 1079850346}
+  connectFirebase: {fileID: 1079850345}
+  syncboard: {fileID: 344092251}
   userNamePanel: {fileID: 395670493}
 --- !u!4 &1703375495
 Transform:
@@ -6748,6 +6771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   giveUpConfirmPanel: {fileID: 906712330}
+  gameController: {fileID: 1703375494}
 --- !u!114 &1892422739 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5874836755534735120, guid: fe12e52cfd199244c9678403880420ce,
