@@ -84,6 +84,8 @@ namespace CommonConfig
         public static int SoloPlayMode{get {return soloPlayMode;}}
         private const int multiPlayMode = 2;
         public static int MultiPlayMode{get {return multiPlayMode;}}
+        private const int giveUpSignal = 9;
+        public static int GiveRpSignal{get {return giveUpSignal;}}
     }
 
     public class BoardStatus

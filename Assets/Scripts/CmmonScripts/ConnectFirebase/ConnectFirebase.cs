@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Firebase;
@@ -46,6 +47,10 @@ interface ISetGo{
     UniTask SetGo((int x, int z, int y, int color) updateInfo);
 }
 
+interface IWaitRivalAction{
+    UniTask<(int x, int z, int y, int color)> WaitRivalAction();
+}
+
 public class GameRecord
 {
     public int win;
@@ -57,11 +62,11 @@ public class GameRecord
     }
 }
 
-public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName, ISetGo
+public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName, ISetGo, IWaitRivalAction
 {
     DatabaseReference reference;
     void Start(){
-        //起動時にでreference作らないといけない
+        //起動時にreference作らないといけない
         reference = FirebaseDatabase.DefaultInstance.RootReference;
     }
 
@@ -147,13 +152,28 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
         //・待機ユーザーがいない場合->null
         //・待機ユーザーがいる場合->ルーム番号
         string existRoomNumber = null;
-            //昇順に並べ替えて最初のレコードを取得してくる
-            await reference.Child(GetKey.MatchingRoomKey).OrderByKey().LimitToFirst(1).GetValueAsync().ContinueWith(task => {
-                if(task.Result.GetRawJsonValue() != null){
-                    existRoomNumber = task.Result.GetRawJsonValue().Substring(2, 8); //キー名が固定ではなく、jsonutilityで変換できないので文字列の切り出しでgameroomの取り出しをする
-                }
-            });
-        return null; //テストのため一旦null   
+        //realtime database内で昇順に並んでいるので最初の(作成日時が一番早い)ゲームルームを取得する
+        await reference.Child(GetKey.MatchingRoomKey).GetValueAsync().ContinueWith(task => {
+            if(task.Result.GetRawJsonValue() != null){
+                existRoomNumber = ParseGameRoomString(task.Result.GetRawJsonValue());
+            }
+        });
+        return existRoomNumber;   
+    }
+
+    private string ParseGameRoomString(string jsonStr){
+        //キー名が固定ではなく、jsonutilityで変換できないので
+        //文字列の切り出しでgameroomの取り出しをする
+        string[] roomStatus = jsonStr.Split(',');
+        string roomNumber = null;
+        foreach(string room in roomStatus){
+            if(room.Contains("false")){
+                //falseの場合のみ有効なゲームルームとして取り出す
+                roomNumber = Regex.Match(room,  @"\d{8}").ToString();
+                break;
+            }
+        }
+        return roomNumber;
     }
 
     //作成した待機ルームの更新(マッチング)を待つ
@@ -222,13 +242,21 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
     }
 
     public async UniTask<(int x, int z, int y, int color)> WaitRivalAction(){
-        Debug.Log("liseten start");
-        reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged += ListenGameStatusUpdate;
+        try{
+            reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged += ListenGameStatusUpdate;
             await UniTask.WaitUntil(() => gameUpdated).ContinueWith(() => {
                 reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged -= ListenGameStatusUpdate;
-            }).Timeout(TimeSpan.FromSeconds(90));
-        gameUpdated = false;
-        return rivalAction;
+            }); //相手のTimeOutがあるのでこちらでTimeOutを設定する必要はない
+            gameUpdated = false;
+            if(rivalAction.x == GameRule.GiveRpSignal){
+                throw new GiveUpSignalReceive();
+            }
+            return rivalAction;
+        }
+        catch (GiveUpSignalReceive){
+            //例外再スロー
+            throw;
+        }
     } 
 
     private void ListenGameStatusUpdate(object sender, ValueChangedEventArgs args){

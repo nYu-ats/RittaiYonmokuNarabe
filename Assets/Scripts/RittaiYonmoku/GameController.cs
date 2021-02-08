@@ -13,7 +13,8 @@ public class GameController : MonoBehaviour
     [SerializeField] TimeCountPanel timeCount;
     [SerializeField] GameObject connectFailedPanel;
     [SerializeField] GameObject npc;
-    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] GameObject connectFirebase;
+    [SerializeField] GameObject syncboard;
     [SerializeField] UserNamePanel userNamePanel;
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
@@ -48,6 +49,10 @@ public class GameController : MonoBehaviour
 
     public delegate void CheckMateEventHandler();
     public event CheckMateEventHandler checkMateEvent = () => {};
+    public delegate void SetUpCompleteEventHandler();
+    public event SetUpCompleteEventHandler setUpComplete = () => {};
+
+
     private async void Start(){
         await SetUpGame();
         userNamePanel.SetPlayerName(player, rivalName);
@@ -58,19 +63,24 @@ public class GameController : MonoBehaviour
     }
 
     private async UniTask SetUpGame(){
-        if(playMode == 1){
+        if(playMode == GameRule.SoloPlayMode){
+            connectFirebase.SetActive(false);
+            syncboard.SetActive(false);
             npc.SetActive(true);
             rivalName = "NPC";
         }
         else{
             npc.SetActive(false);
-            await connectFirebase.SetGameRoom(gameRoom, player);
+            await connectFirebase.GetComponent<ConnectFirebase>().SetGameRoom(gameRoom, player);
             try{
-                rivalName = await connectFirebase.GetRivalName(gameRoom, rival);
+                rivalName = await connectFirebase.GetComponent<ConnectFirebase>().GetRivalName(gameRoom, rival);
             }
             catch (TimeoutException){
                 connectFailedPanel.SetActive(true);
             }
+            connectFirebase.SetActive(true);
+            syncboard.SetActive(true);
+            setUpComplete();
         }
     }
 

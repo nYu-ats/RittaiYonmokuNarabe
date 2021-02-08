@@ -50,10 +50,16 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
 {
     [SerializeField] Board board;
     [SerializeField] GoGenerator goGenerator;
+    [SerializeField] TimeCountPanel timeCountPanel;
+    [SerializeField] GameController gameController;
     private (int x, int z, int y, int color) lastUpdate;
     public (int x, int z, int y, int color) LastUpdate{get {return lastUpdate;}}
     public delegate void BoardUpdateEventHandler();
     public event BoardUpdateEventHandler boardUpdated = () => {};
+
+    void Start(){
+        timeCountPanel.timeOut += RandomPut;
+    }
 
     public void AddGo(int xIndex, int zIndex, int addColor){
         int canPutIndexY = CheckCanPut(xIndex, zIndex);
@@ -62,6 +68,14 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             goGenerator.PutGo(xIndex, zIndex, addColor);
             lastUpdate = (xIndex, zIndex, canPutIndexY, addColor);
             boardUpdated();
+        }
+    }
+    private void RandomPut(){
+        //制限時間を過ぎた場合には適当な場所に碁を置く
+        GoSituations[] canPutPos = VacantPos();
+        if(canPutPos != null){
+            int rndIndex = UnityEngine.Random.Range(0, canPutPos.Length);
+            AddGo(canPutPos[rndIndex].Positions[0].x, canPutPos[rndIndex].Positions[0].z, gameController.CurrentTurn);
         }
     }
 

@@ -14,5 +14,10 @@ namespace CustomException
     {
 
     }
+
+    public class GiveUpSignalReceive: Exception
+    {
+        
+    }
     
 }

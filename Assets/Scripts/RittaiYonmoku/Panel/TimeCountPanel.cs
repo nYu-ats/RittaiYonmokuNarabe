@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using CommonConfig;
 
 public class TimeCountPanel : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class TimeCountPanel : MonoBehaviour
     private float timeLimit = 90.0f;
     private bool doTimeCount = false; //GameControlerでtrueにセットしてカウントを開始
     public bool DoTimeCount{set {doTimeCount = value;}}
+    public delegate void TimeOutEventHandler();
+    public event TimeOutEventHandler timeOut = () => {};
 
     void Start(){
         boardController.boardUpdated += ResetTimeCount;
@@ -25,8 +28,14 @@ public class TimeCountPanel : MonoBehaviour
             time -= Time.deltaTime;
             timeCountText.text = String.Format("Time : {0:00}", Mathf.Floor(time));
             if(time <= 0){
-                //時間切れになったらランダムで碁を置く
-                RandomPut();
+                if(gameController.PlayMode == GameRule.SoloPlayMode){
+                    //ソロプレイの場合は自身とNPC両ターンでタイムアウトを発生させる
+                    timeOut();
+                }
+                else if(gameController.CurrentTurn == gameController.Player){
+                    //マルチプレイの場合は自身のターンのみタイムアウトを発生させる
+                    timeOut();
+                }
             }
         }
     }
@@ -39,14 +48,5 @@ public class TimeCountPanel : MonoBehaviour
     public void SwitchTimeCountStatus(bool status){
         //時間カウントを止めるかリスタートさせるか
         doTimeCount = status;
-    }
-
-    private void RandomPut(){
-        //制限時間を過ぎた場合には適当な場所に碁を置く
-        GoSituations[] canPutPos = boardController.VacantPos();
-        if(canPutPos != null){
-            int rndIndex = UnityEngine.Random.Range(0, canPutPos.Length);
-            boardController.AddGo(canPutPos[rndIndex].Positions[0].x, canPutPos[rndIndex].Positions[0].z, gameController.CurrentTurn);
-        }
     }
 }
