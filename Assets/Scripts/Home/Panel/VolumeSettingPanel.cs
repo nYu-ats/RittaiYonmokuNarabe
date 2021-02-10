@@ -7,9 +7,9 @@ public class VolumeSettingPanel : MonoBehaviour
     [SerializeField] Button[] volumeButtons;
     //フォーカス/非フォーカスの色をインスペクターから設定できるようにする
     [SerializeField] Color focusedTextColor = new Color(255, 255, 255, 1);
-    [SerializeField] Color focusedImageColor = new Color(0, 0, 0, 1);
-    [SerializeField] Color notFocusedTextColor = new Color(0, 0, 0, 1);
-    [SerializeField] Color notFocusedImageColor = new Color(255, 255, 255, 1);
+    [SerializeField] Color focusedImageColor = new Color(100, 255, 0, 1);
+    [SerializeField] Color notFocusedTextColor = new Color(50, 50, 50, 1);
+    [SerializeField] Color notFocusedImageColor = new Color(89, 89, 89, 1);
 
     void Start()
     {

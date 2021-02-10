@@ -9,6 +9,7 @@ public class UserInformationPanel : MonoBehaviour
     [SerializeField] Text loseText;
     [SerializeField] Text userNameText;
     [SerializeField] ConnectFirebase connectFirebase;
+    private string attachToUserNameText = "さんの戦績";
     async void Start()
     {
         string userName = SetUserName();
@@ -17,7 +18,7 @@ public class UserInformationPanel : MonoBehaviour
 
     private string SetUserName(){
         string userName = PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey);
-        userNameText.text = userName;
+        userNameText.text = userName + attachToUserNameText;
         return userName;
     }
 

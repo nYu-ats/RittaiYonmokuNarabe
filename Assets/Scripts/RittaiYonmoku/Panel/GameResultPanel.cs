@@ -25,18 +25,18 @@ public class GameResultPanel : MonoBehaviour
         }
 
         if(winner == gameController.Player){
-            winnerText.text = player + "の勝利!!";
+            winnerText.text = "勝者 : " + player;
             if(gameController.PlayMode == GameRule.MultiPlayMode){
                     await connectFirebase.SetRecord(player, currentRecord.win + 1, currentRecord.lose);
                 }
             }
         else{
-            winnerText.text = gameController.RivalName + "の勝利!!";
+            winnerText.text = "勝者 : " + gameController.RivalName;
             if(gameController.PlayMode == GameRule.MultiPlayMode){
                     await connectFirebase.SetRecord(player, currentRecord.win, currentRecord.lose + 1);
                 }
         }
-        numberOfMove.text = (GameRule.TotalGoNumber - restGoNumber).ToString();
+        numberOfMove.text = (GameRule.TotalGoNumber - restGoNumber).ToString() + "手";
         ReturnToHomeButton.enabled = true; //全てのリザルト処理が終わった段階でホームへ戻れるようにする
     }
 }
