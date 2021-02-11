@@ -16,6 +16,8 @@ public class PutPositionPanel : MonoBehaviour
     [SerializeField] BoardController boardController;
     private (int x, int z) indexXZ = (0, 0);
     public (int x, int z) IndexXZ{get {return indexXZ;}} //置くボタンからアクセスするためのプロパティ
+    public delegate void PanelUpdatedEventHandler(int x, int z);
+    public event PanelUpdatedEventHandler panelUpdated = (int x, int z) => {};
 
     public void Start(){
         //各ボタンにクリック時の呼び出されるイベントのハンドラー追加
@@ -39,6 +41,7 @@ public class PutPositionPanel : MonoBehaviour
             indexXZ.z = indexZ;
             Transform selectedPos = this.gameObject.transform.Find(indexX.ToString() + indexZ.ToString());
             CurosrImg.transform.position = selectedPos.position;
+            panelUpdated(indexXZ.x, indexXZ.z);
         }
     }
 }

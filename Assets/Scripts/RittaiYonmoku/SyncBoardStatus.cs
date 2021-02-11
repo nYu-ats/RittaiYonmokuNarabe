@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 using CommonConfig;
 using Cysharp.Threading.Tasks;
 using CustomException;
@@ -12,7 +13,8 @@ public class SyncBoardStatus : MonoBehaviour
     [SerializeField] GameController gameController;
     [SerializeField] ConnectFirebase connectFirebase;
     [SerializeField] GameObject gameResultPanel;
-    [SerializeField] TimeCountPanel timeCountPanel;  
+    [SerializeField] TimeCountPanel timeCountPanel;
+    [SerializeField] Text connectingText;  
     void Start(){
         gameController.setUpComplete += InitializeSyncStatus;
     }
@@ -33,13 +35,16 @@ public class SyncBoardStatus : MonoBehaviour
     }
 
     private void SetGo(){
+        connectingText.enabled = true;
         UniTask.Create(async () => {
             await connectFirebase.SetGo(boardController.LastUpdate);
             boardController.boardUpdated -= SyncBoard; //相手のボード更新時に呼び出せれないようにする
+            connectingText.enabled = false;
         }).Forget();
     }
 
     private void ListenRival(){
+        connectingText.enabled = true;
         try{
             UniTask.Create(async () => {
                 (int x, int z, int y, int color) rivalAction = await connectFirebase.WaitRivalAction();
@@ -51,12 +56,17 @@ public class SyncBoardStatus : MonoBehaviour
             timeCountPanel.SwitchTimeCountStatus(false);
             gameResultPanel.SetActive(true);
         }
+        finally{
+            connectingText.enabled = false;
+        }
     }
 
     public void GiveUpAction(){
+        connectingText.enabled = true;
         UniTask.Create(async () => {
             boardController.boardUpdated -= SyncBoard;
             await connectFirebase.SetGo((GameRule.GiveRpSignal, GameRule.GiveRpSignal, GameRule.GiveRpSignal, GameRule.GiveRpSignal));
+            connectingText.enabled = false;
         }).Forget();
     }
 }

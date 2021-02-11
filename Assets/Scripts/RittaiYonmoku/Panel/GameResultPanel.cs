@@ -12,6 +12,7 @@ public class GameResultPanel : MonoBehaviour
     [SerializeField] GameController gameController;
     [SerializeField] ConnectFirebase connectFirebase;
     [SerializeField] Button ReturnToHomeButton;
+    [SerializeField] Text connectingText;
     async void Start()
     {
         int winner = gameController.CurrentTurn;
@@ -19,6 +20,7 @@ public class GameResultPanel : MonoBehaviour
         string player = PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey);
         GameRecord currentRecord = null;
         if(gameController.PlayMode == GameRule.MultiPlayMode){
+            connectingText.enabled = true;
             await UniTask.Run(async () => {
             currentRecord = await connectFirebase.GetRecord(player);
             });
@@ -27,15 +29,16 @@ public class GameResultPanel : MonoBehaviour
         if(winner == gameController.Player){
             winnerText.text = "勝者 : " + player;
             if(gameController.PlayMode == GameRule.MultiPlayMode){
-                    await connectFirebase.SetRecord(player, currentRecord.win + 1, currentRecord.lose);
-                }
+                await connectFirebase.SetRecord(player, currentRecord.win + 1, currentRecord.lose);
             }
+        }
         else{
             winnerText.text = "勝者 : " + gameController.RivalName;
             if(gameController.PlayMode == GameRule.MultiPlayMode){
                     await connectFirebase.SetRecord(player, currentRecord.win, currentRecord.lose + 1);
                 }
         }
+        connectingText.enabled = false;
         numberOfMove.text = (GameRule.TotalGoNumber - restGoNumber).ToString() + "手";
         ReturnToHomeButton.enabled = true; //全てのリザルト処理が終わった段階でホームへ戻れるようにする
     }

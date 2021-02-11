@@ -277,4 +277,6 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
             }
         }
     }
+
+    
 }

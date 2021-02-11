@@ -16,6 +16,7 @@ public class GameController : MonoBehaviour
     [SerializeField] GameObject connectFirebase;
     [SerializeField] GameObject syncboard;
     [SerializeField] UserNamePanel userNamePanel;
+    [SerializeField] Text connectingText;
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
     private int currentTurn;
@@ -65,6 +66,7 @@ public class GameController : MonoBehaviour
 
     private async UniTask SetUpGame(){
         if(playMode == GameRule.SoloPlayMode){
+            connectingText.enabled = false;
             connectFirebase.SetActive(false);
             syncboard.SetActive(false);
             npc.SetActive(true);
@@ -72,6 +74,7 @@ public class GameController : MonoBehaviour
         }
         else{
             npc.SetActive(false);
+            connectingText.enabled = true;
             await connectFirebase.GetComponent<ConnectFirebase>().SetGameRoom(gameRoom, player);
             try{
                 rivalName = await connectFirebase.GetComponent<ConnectFirebase>().GetRivalName(gameRoom, rival);
@@ -81,6 +84,7 @@ public class GameController : MonoBehaviour
             }
             connectFirebase.SetActive(true);
             syncboard.SetActive(true);
+            connectingText.enabled = false;
             setUpComplete();
         }
     }

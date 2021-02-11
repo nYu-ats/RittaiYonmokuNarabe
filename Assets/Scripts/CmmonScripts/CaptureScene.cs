@@ -10,7 +10,7 @@ public class CaptureScene : MonoBehaviour
         time = 0.0f;
     }
 
-    void Update(){
+    /*void Update(){
         if(time < shotTime){
             time += Time.deltaTime;
         }
@@ -18,5 +18,5 @@ public class CaptureScene : MonoBehaviour
             ScreenCapture.CaptureScreenshot("Assets/Image/HomeImage2.png");
             Debug.Log("captured");
         }
-    }
+    }*/
 }
