@@ -14,7 +14,9 @@ public class SyncBoardStatus : MonoBehaviour
     [SerializeField] ConnectFirebase connectFirebase;
     [SerializeField] GameObject gameResultPanel;
     [SerializeField] TimeCountPanel timeCountPanel;
-    [SerializeField] Text connectingText;  
+    [SerializeField] Text connectingText;
+    public delegate void RivalGiveUpEventHandler();
+    public event RivalGiveUpEventHandler rivalGiveUp = () => {}; 
     void Start(){
         gameController.setUpComplete += InitializeSyncStatus;
     }
@@ -43,18 +45,23 @@ public class SyncBoardStatus : MonoBehaviour
         }).Forget();
     }
 
-    private void ListenRival(){
+    private async void ListenRival(){
         connectingText.enabled = true;
         try{
-            UniTask.Create(async () => {
+            await UniTask.Run(async () => {
                 (int x, int z, int y, int color) rivalAction = await connectFirebase.WaitRivalAction();
                 boardController.AddGo(rivalAction.x, rivalAction.z, rivalAction.color);
                 boardController.boardUpdated += SyncBoard;
-            }).Forget();
+            });
         }
         catch (GiveUpSignalReceive){
+            gameController.CurrentTurn = gameController.Player; //相手がギブアップしたので勝者は自分に設定する
+            boardController.boardUpdated -= SyncBoard;
             timeCountPanel.SwitchTimeCountStatus(false);
+            rivalGiveUp();
+            /*
             gameResultPanel.SetActive(true);
+            */
         }
         finally{
             connectingText.enabled = false;
@@ -65,7 +72,7 @@ public class SyncBoardStatus : MonoBehaviour
         connectingText.enabled = true;
         UniTask.Create(async () => {
             boardController.boardUpdated -= SyncBoard;
-            await connectFirebase.SetGo((GameRule.GiveRpSignal, GameRule.GiveRpSignal, GameRule.GiveRpSignal, GameRule.GiveRpSignal));
+            await connectFirebase.SetGo((GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal));
             connectingText.enabled = false;
         }).Forget();
     }

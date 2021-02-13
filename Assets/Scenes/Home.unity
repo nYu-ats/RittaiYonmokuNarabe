@@ -1997,7 +1997,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb129b1c5a0e4b14a83ad6c7bdee6b76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioClips: []
+  audioClips:
+  - {fileID: 8300000, guid: 1e18651b4128457469b80025cd08db7e, type: 3}
+  - {fileID: 8300000, guid: 9c6237dfc9e63fe4fb836465f814b7cf, type: 3}
+  - {fileID: 8300000, guid: 7cdc866bcfbbd3d498691cb52e642ba5, type: 3}
 --- !u!82 &909011491
 AudioSource:
   m_ObjectHideFlags: 0

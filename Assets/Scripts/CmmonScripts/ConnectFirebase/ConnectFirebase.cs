@@ -252,7 +252,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
                 reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged -= ListenGameStatusUpdate;
             }); //相手のTimeOutがあるのでこちらでTimeOutを設定する必要はない
             gameUpdated = false;
-            if(rivalAction.x == GameRule.GiveRpSignal){
+            if(rivalAction.x == GameRule.GiveUpSignal){
                 throw new GiveUpSignalReceive();
             }
             return rivalAction;
@@ -274,7 +274,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
                 int x = int.Parse(str.Value[0].ToString());
                 int z = int.Parse(str.Value[1].ToString());
                 int y = int.Parse(str.Value[2].ToString());
-                if(boardController.CheckCanPut(x, z) == y){
+                if(boardController.CheckCanPut(x, z) == y | x == GameRule.GiveUpSignal){
                     rivalAction = (x, z, y, gameController.Rival);
                     gameUpdated = true;
                 }

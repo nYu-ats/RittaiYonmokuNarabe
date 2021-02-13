@@ -90,7 +90,7 @@ namespace CommonConfig
         private const int multiPlayMode = 2;
         public static int MultiPlayMode{get {return multiPlayMode;}}
         private const int giveUpSignal = 9;
-        public static int GiveRpSignal{get {return giveUpSignal;}}
+        public static int GiveUpSignal{get {return giveUpSignal;}}
     }
 
     public class BoardStatus
