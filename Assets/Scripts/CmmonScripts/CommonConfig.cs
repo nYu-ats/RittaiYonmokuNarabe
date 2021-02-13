@@ -56,6 +56,11 @@ namespace CommonConfig
             public static string WhiteGo{get {return whiteGo;}}
             private const string blackGo = "BlackGo";
             public static string BlackGo{get {return blackGo;}}
+            private const string reachChecker = "ReachChecker";
+            public static string ReachChecker{get {return reachChecker;}}
+            private const string reachDisplaySwitcher = "ReachDisplaySwitcher";
+            public static string ReachDisplaySwitcher{get {return reachDisplaySwitcher;}}
+
 
         }
     }

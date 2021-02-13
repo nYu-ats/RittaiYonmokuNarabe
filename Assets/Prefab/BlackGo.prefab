@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 738302408920749505}
   - component: {fileID: 4763689966958367663}
   - component: {fileID: 8961154289981209628}
+  - component: {fileID: -2407356135358307086}
+  - component: {fileID: 7635023663813142230}
   m_Layer: 0
   m_Name: BlackGo
   m_TagString: BlackGo
@@ -152,3 +154,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &-2407356135358307086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142580742530366397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbf3575480402db40813e763382412fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: 2
+  eraseRenderer: 0
+--- !u!114 &7635023663813142230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142580742530366397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de4e0131f8d92684792579c4b5842fc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

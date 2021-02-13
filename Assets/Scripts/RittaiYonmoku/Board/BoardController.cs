@@ -65,7 +65,7 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
         int canPutIndexY = CheckCanPut(xIndex, zIndex);
         if(canPutIndexY != BoardStatus.CanNotPut){
             board.boardStatusArray[Array.IndexOf(board.posArray, (xIndex, zIndex, canPutIndexY))] = addColor;
-            goGenerator.PutGo(xIndex, zIndex, addColor);
+            goGenerator.PutGo(xIndex, zIndex, canPutIndexY, addColor);
             lastUpdate = (xIndex, zIndex, canPutIndexY, addColor);
             boardUpdated();
         }

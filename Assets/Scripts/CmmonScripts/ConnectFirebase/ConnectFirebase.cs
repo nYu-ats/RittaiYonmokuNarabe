@@ -51,6 +51,10 @@ interface IWaitRivalAction{
     UniTask<(int x, int z, int y, int color)> WaitRivalAction();
 }
 
+interface IDeleteGamerRoom{
+    UniTask DeleteGameRoom();
+}
+
 public class GameRecord
 {
     public int win;
@@ -62,7 +66,7 @@ public class GameRecord
     }
 }
 
-public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName, ISetGo, IWaitRivalAction
+public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, ISetRecord, IGetRecord, ISetGameRoom, IGetRivalName, ISetGo, IWaitRivalAction, IDeleteGamerRoom
 {
     DatabaseReference reference;
     void Start(){
@@ -278,5 +282,7 @@ public class ConnectFirebase:MonoBehaviour, ISetUserName, IUserNameValidation, I
         }
     }
 
-    
+    public async UniTask DeleteGameRoom(){
+        await reference.Child(gameController.GameRoom.ToString()).SetValueAsync(null);
+    }    
 }
