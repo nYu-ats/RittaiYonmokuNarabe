@@ -7,15 +7,23 @@ interface IPlaySE{
 
 public class PlaySE : MonoBehaviour, IPlaySE
 {
-    private float volume = 0.0f;
+    [SerializeField] VolumeButton[] volumeButton;
+    private float seVolume = 0.0f;
     void Start(){
-        volume = PlayerPrefs.GetInt(PlayerPrefsKey.VolumeKey) / AudioConfig.MaxVolume;
-        this.GetComponent<AudioSource>().volume = volume;
+        UpdateVolume();
+        foreach(VolumeButton vBtn in volumeButton){
+            vBtn.volumeUpdateEvent += UpdateVolume;
+        }
     }
 
     [SerializeField] AudioClip[] audioClips;
 
     public void PlaySound(int clipNumber){
         this.GetComponent<AudioSource>().PlayOneShot(audioClips[clipNumber]);
+    }
+
+    private void UpdateVolume(){
+        seVolume = PlayerPrefs.GetInt(PlayerPrefsKey.VolumeKey) / AudioConfig.MaxVolume;
+        this.GetComponent<AudioSource>().volume = seVolume;
     }
 }

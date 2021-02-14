@@ -7,7 +7,9 @@ public class MultiPlayButton : BasePlayButton
 {
     [SerializeField] ConnectFirebase connectFirebase;
     [SerializeField] Text connectingText;
+    [SerializeField] PlaySE playSE;
     public async void OnButtonClicked(int modeNumber){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
         loadPlayMode = modeNumber;
         connectingText.enabled = true;
         //マッチング完了を待機

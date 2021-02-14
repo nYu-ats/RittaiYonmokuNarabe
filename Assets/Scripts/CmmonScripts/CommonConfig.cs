@@ -37,6 +37,18 @@ namespace CommonConfig
         //オーディオ周りの設定
         private const float maxVolume = 2.0f;
         public static float MaxVolume{get {return maxVolume;}}
+        private const int buttonPushIndex = 0;
+        public static int ButtonPushIndex{get {return buttonPushIndex;}}
+        private const int returnIndex = 1;
+        public static int ReturnIndex{get {return returnIndex;}}
+        private const int volumeButton = 2;
+        public static int VolumeButton{get {return volumeButton;}}
+        private const int goPutButtonIndex = 2;
+        public static int GoPutButtonIndex{get {return goPutButtonIndex;}}
+        private const int goPositionMoveButtonIndex = 3;
+        public static int GoPositionMoveButtonIndex{get {return goPositionMoveButtonIndex;}}
+        private const int gameEndIndex = 4;
+        public static int GameEndIndex{get {return gameEndIndex;}}
     }
 
     public class Tags

@@ -1,13 +1,18 @@
 ﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using CommonConfig;
+using Cysharp.Threading.Tasks;
 
 public class SoloPlayButton : BasePlayButton
 {
-    public void OnButtonClicked(int modeNumber){
+    [SerializeField] PlaySE playSE;
+    public async void OnButtonClicked(int modeNumber){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
+        await UniTask.Delay(500); //ボタンクリック音の再生を待つ
         loadPlayMode = modeNumber;
         //ソロプレイ時の先行後攻はランダムに決める
-        Random rnd = new Random();
+        System.Random rnd = new System.Random();
         if(rnd.Next(0, 2) % 2 == 0){
             playerColor = GameRule.FirstAttack;
             rivalColor = GameRule.SecondAttack;

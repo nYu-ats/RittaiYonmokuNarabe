@@ -5,6 +5,7 @@ using CommonConfig;
 public class RegisterButton : MonoBehaviour
 {
     [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] PlaySE playSE;
     public string inputUserName = "";
     private bool validFlag = false;
 
@@ -21,6 +22,7 @@ public class RegisterButton : MonoBehaviour
     public event FetchUserNameEventHandler fetchUserNameEvent = () => {};
 
     public async void ButtonClicked(){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
         connectingEvent(true); //通信処理に入る直前に通信中メッセージを表示する
         fetchUserNameEvent();
         await UniTask.Run(async() => {

@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
     [SerializeField] GameObject syncboard;
     [SerializeField] UserNamePanel userNamePanel;
     [SerializeField] Text connectingText;
+    [SerializeField] GameObject playBGM;
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
     private int currentTurn;
@@ -61,6 +62,7 @@ public class GameController : MonoBehaviour
         //boardController.boardUpdated += ConfirmCheckMate;
         boardController.boardUpdated += TurnChange;
         TurnSet(GameRule.FirstAttack); //ゲーム開始時のターンのセット
+        playBGM.SetActive(true);
         timeCount.DoTimeCount = true;
     }
 

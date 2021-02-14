@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
-using Cysharp.Threading.Tasks;
 
 public class PutButton : MonoBehaviour
 {
@@ -11,6 +10,7 @@ public class PutButton : MonoBehaviour
     //テスト用
     [SerializeField] PutPositionPanel putPositionPanel;
     [SerializeField] GameController gameController;
+    [SerializeField] PlaySE playSE;
     private int goColor;
 
     void Start(){
@@ -23,6 +23,7 @@ public class PutButton : MonoBehaviour
     }
 
     public void OnClicked(){
+        playSE.PlaySound(AudioConfig.GoPutButtonIndex);
         boardController.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
         //連続してクリックされるのを防ぐため初回クリック時にfalseにする
         //自分のターンが回ってきたときにはGameControllerからtrueにされる

@@ -10,7 +10,9 @@ public class ReturnToHomeButton : MonoBehaviour
 {
     [SerializeField] ConnectFirebase connectFirebase;
     [SerializeField] GameController gameController;
+    [SerializeField] PlaySE playSE;
     public async void OnClicked(){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
         await UniTask.Run(async () => {
             await connectFirebase.DeleteGameRoom();
         });

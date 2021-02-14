@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CommonConfig;
 public class ReachViewButton : MonoBehaviour
 {
     public delegate void ReachDisplaySwitchEventHandler();
     public event ReachDisplaySwitchEventHandler switchEvent = () => {};
     [SerializeField] Text reachOnText;
     [SerializeField] Text reachOffText;
+    [SerializeField] PlaySE playSE;
     private bool currentFlag;
     public bool CurrentFlag{get {return currentFlag;}}
 
@@ -18,6 +20,7 @@ public class ReachViewButton : MonoBehaviour
     }
 
     public void OnClicked(){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
         SwitchText(currentFlag);
         switchEvent();
     }

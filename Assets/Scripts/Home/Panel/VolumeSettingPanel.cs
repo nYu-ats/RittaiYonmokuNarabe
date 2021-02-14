@@ -15,7 +15,7 @@ public class VolumeSettingPanel : MonoBehaviour
     {
         //イベントハンドラーを追加
         foreach(Button btn in volumeButtons){
-            btn.GetComponent<VolumeButton>().uiUpdateEvent += ChangeVolumeFocus;
+            btn.GetComponent<VolumeButton>().volumeUpdateEvent += ChangeVolumeFocus;
         }
         ChangeVolumeFocus(); //パネルを開いた時点での音量にフォーカスする
     }

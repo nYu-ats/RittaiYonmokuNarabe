@@ -13,6 +13,7 @@ public class GameStatusPanel : MonoBehaviour
     [SerializeField] int statusDisplayTime = 3000;
     [SerializeField] SyncBoardStatus syncBoardStatus;
     [SerializeField] GameObject giveUpUI;
+    [SerializeField] PlaySE playSE;
     void Start()
     {
         gameController.checkMateEvent += DisplayCheckMate;
@@ -22,6 +23,7 @@ public class GameStatusPanel : MonoBehaviour
     }
 
     private async void DisplayCheckMate(){
+        playSE.PlaySound(AudioConfig.GameEndIndex);
         checkMateUI.SetActive(true);
         await UniTask.Delay(statusDisplayTime)
         .ContinueWith(() => gameResultPanel.SetActive(true)); //ゲームリザルトを表示するまで数秒間をあける
@@ -32,6 +34,7 @@ public class GameStatusPanel : MonoBehaviour
     }
 
     private async void RivalGiveUp(){
+        playSE.PlaySound(AudioConfig.GameEndIndex);
         giveUpUI.SetActive(true);
         await UniTask.Delay(statusDisplayTime)
         .ContinueWith(() => gameResultPanel.SetActive(true));

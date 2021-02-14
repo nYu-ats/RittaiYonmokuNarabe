@@ -4,12 +4,14 @@ using UnityEngine.UI;
 public class HomePanel : MonoBehaviour
 {
     [SerializeField] GameObject returnButton;
-    [SerializeField] Button volumeSettingOpenButton;
+    [SerializeField] Button[] PanleOpenButton;
     public GameObject isActivePanel;
 
     void Start(){
         //イベントハンドラーを追加
-        volumeSettingOpenButton.GetComponent<OpenPnaelButton>().panelActiveEvent += SwitchActivePanel;
+        foreach(Button btn in PanleOpenButton){
+            btn.GetComponent<OpenPnaelButton>().panelActiveEvent += SwitchActivePanel;
+        }
     }
 
     //パネルを開くボタンからのイベントを受け取って

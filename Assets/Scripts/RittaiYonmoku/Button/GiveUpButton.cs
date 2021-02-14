@@ -7,8 +7,10 @@ public class GiveUpButton : MonoBehaviour
 {
     [SerializeField] GameObject giveUpConfirmPanel;
     [SerializeField] GameController gameController;
+    [SerializeField] PlaySE playSE;
 
     public void OnClicked(){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
         giveUpConfirmPanel.SetActive(true);
         if(gameController.PlayMode == GameRule.SoloPlayMode){
             Time.timeScale = 0;

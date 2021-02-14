@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using CommonConfig;
 
 public class GoTransparentButton : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class GoTransparentButton : MonoBehaviour
     private (float transparent, float normal) colorA = (transparent: 0.1f, normal:1.0f);
     [SerializeField] Image transparentedIcon;
     [SerializeField] Image normalIcon;
+    [SerializeField] PlaySE playSE;
 
     void Start(){
         goMat.color = new Color(goMat.color.r, goMat.color.g, goMat.color.b, colorA.normal);
@@ -18,6 +20,7 @@ public class GoTransparentButton : MonoBehaviour
     }
 
     public void OnClicked(){
+        playSE.PlaySound(AudioConfig.ButtonPushIndex);
         if(isTransparented){
             goMat.color = new Color(goMat.color.r, goMat.color.g, goMat.color.b, colorA.normal);
             transparentedIcon.enabled = false;
