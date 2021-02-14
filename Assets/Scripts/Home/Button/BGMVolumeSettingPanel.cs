@@ -1,6 +1,8 @@
 ﻿using UnityEngine.UI;
 using CommonConfig;
 
+//VolumeSettingPanelを継承
+//Start時のprefsKey設定行にて、BGM用のキーを設定するようにする
 public class BGMVolumeSettingPanel : VolumeSettingPanel
 {
     protected override void Start()

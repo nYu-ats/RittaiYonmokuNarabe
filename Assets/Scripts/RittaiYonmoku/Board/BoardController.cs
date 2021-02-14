@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 using CommonConfig;
@@ -48,14 +46,14 @@ public class GoSituations
 
 public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, IVacantPos
 {
+    public delegate void BoardUpdateEventHandler();
+    public event BoardUpdateEventHandler boardUpdated = () => {};
     [SerializeField] Board board;
     [SerializeField] GoGenerator goGenerator;
     [SerializeField] TimeCountPanel timeCountPanel;
     [SerializeField] GameController gameController;
     private (int x, int z, int y, int color) lastUpdate;
     public (int x, int z, int y, int color) LastUpdate{get {return lastUpdate;}}
-    public delegate void BoardUpdateEventHandler();
-    public event BoardUpdateEventHandler boardUpdated = () => {};
 
     void Start(){
         timeCountPanel.timeOut += RandomPut;
@@ -83,9 +81,10 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
         //指定のXZ座標で碁が置けるかどうかの確認
         try{
             int[] indexArray = board.posArray.Select((item, index) => new {Index = index, Value = item})
-            .Where(item => item.Value.x == xIndex & item.Value.z == zIndex).Select(item => item.Index).ToArray();
+                               .Where(item => item.Value.x == xIndex & item.Value.z == zIndex).Select(item => item.Index).ToArray();
+
             return indexArray.Where(item => board.boardStatusArray[item] == BoardStatus.Vacant)
-            .Select(item => board.posArray[item].y).First();
+                   .Select(item => board.posArray[item].y).First(); //nullだった場合例外スロー
         }
         catch{
             //すでに4つの碁が置かれている場合
@@ -94,12 +93,14 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
     }
 
     public GoSituations[] VacantPos(){
+        //ボードの空き状況を調べる
         (int x, int z, int y)[] vacantArray = board.posArray.Select((item, index) => new {Index = index, Value = item})
-        .Where(item => board.boardStatusArray[item.Index] == BoardStatus.Vacant).Select(item => item.Value).ToArray();
+                                              .Where(item => board.boardStatusArray[item.Index] == BoardStatus.Vacant).Select(item => item.Value).ToArray();
+        //抜き出した空ポジションから返却用のオブジェクトを作る
         GoSituations[] vacantPos = new GoSituations[vacantArray.Length];
         for(int index = 0; index < vacantArray.Length; index++){
-            GoSituations tmpReachLine = new GoSituations(vacantArray, BoardStatus.Vacant, LinePattern.Pattern0);
-            vacantPos[index] = tmpReachLine;
+            vacantPos[index] = new GoSituations(vacantArray, BoardStatus.Vacant, LinePattern.Pattern0);
+            //vacantPos[index] = tmpReachLine;
         }
         return vacantPos;
     }

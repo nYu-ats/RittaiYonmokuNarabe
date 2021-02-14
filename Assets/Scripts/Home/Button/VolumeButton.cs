@@ -4,8 +4,7 @@ using UnityEngine.UI;
 
 public class VolumeButton : MonoBehaviour
 {
-    //UI更新時に子オブジェクトにアクセスしなくていいように
-    //更新時に必要な要素だけこちらで変数に入れておく
+    //UI更新のため自身の画像とテキストを保持しておく
     [System.Serializable]
     public struct VolumeButtonUI{
         public Image volumeImage;

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿//複数のクラスからアクセスされるような共通の設定値をここにまとめる
 
 namespace CommonConfig
 {
