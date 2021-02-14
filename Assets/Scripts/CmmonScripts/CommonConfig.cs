@@ -22,6 +22,8 @@ namespace CommonConfig
         
         private const string volumeKey = "Volume";
         public static string VolumeKey{get {return volumeKey;}}
+        private const string bgmVolumeKey = "BGM";
+        public static string BgmVolumeKey{get {return bgmVolumeKey;}}
     }
 
     public class MatchingPattern
@@ -37,6 +39,8 @@ namespace CommonConfig
         //オーディオ周りの設定
         private const float maxVolume = 2.0f;
         public static float MaxVolume{get {return maxVolume;}}
+        private const float maxBgmVolume = 5.0f;
+        public static float MaxBgmVolume{get {return maxBgmVolume;}}
         private const int buttonPushIndex = 0;
         public static int ButtonPushIndex{get {return buttonPushIndex;}}
         private const int returnIndex = 1;

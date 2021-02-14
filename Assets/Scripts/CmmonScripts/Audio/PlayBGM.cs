@@ -5,7 +5,6 @@ public class PlayBGM : MonoBehaviour
 {
     [SerializeField] VolumeButton[] volumeButton;
     private float volume = 0.0f;
-    private float adjustVolumeNum = 2.0f;
     void Start(){
         UpdateVolume();
         foreach(VolumeButton vBtn in volumeButton){
@@ -15,7 +14,7 @@ public class PlayBGM : MonoBehaviour
     }
 
     private void UpdateVolume(){
-        volume = PlayerPrefs.GetInt(PlayerPrefsKey.VolumeKey) /AudioConfig.MaxVolume /adjustVolumeNum;
+        volume = PlayerPrefs.GetInt(PlayerPrefsKey.BgmVolumeKey) / AudioConfig.MaxBgmVolume;
         this.GetComponent<AudioSource>().volume = volume;
     }
 }
