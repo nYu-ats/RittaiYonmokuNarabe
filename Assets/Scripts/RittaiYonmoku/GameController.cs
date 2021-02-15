@@ -1,12 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using CommonConfig;
 using System;
 public class GameController : MonoBehaviour
 {
+    public delegate void CheckMateEventHandler();
+    public event CheckMateEventHandler checkMateEvent = () => {};
+    public delegate void SetUpCompleteEventHandler();
+    public event SetUpCompleteEventHandler setUpComplete = () => {};
+
     [SerializeField] Button goPutButton;
     [SerializeField] Button giveUpButton;
     [SerializeField] BoardController boardController;
@@ -50,18 +53,11 @@ public class GameController : MonoBehaviour
     private string rivalName = "";
     public string RivalName{get {return rivalName;}}
 
-    public delegate void CheckMateEventHandler();
-    public event CheckMateEventHandler checkMateEvent = () => {};
-    public delegate void SetUpCompleteEventHandler();
-    public event SetUpCompleteEventHandler setUpComplete = () => {};
-
-
     private async void Start(){
         await SetUpGame();
         userNamePanel.SetPlayerName(player, rivalName);
-        //boardController.boardUpdated += ConfirmCheckMate;
         boardController.boardUpdated += TurnChange;
-        TurnSet(GameRule.FirstAttack); //ゲーム開始時のターンのセット
+        TurnSet(GameRule.FirstAttack); //初ターンセット
         playBGM.SetActive(true);
         timeCount.DoTimeCount = true;
     }
@@ -126,7 +122,7 @@ public class GameController : MonoBehaviour
         if(checkMateArray != null){
             timeCount.SwitchTimeCountStatus(false);
             boardController.boardUpdated -= TurnChange; //チェックメイトが発生した場合はターンの切替を行わないようにする
-            npc.SetActive(false); //currentTurnが相手の状態なので、余計な碁が置かれないためdisactiveにする
+            npc.SetActive(false); //currentTurnが相手の状態なので、余計な碁が置かれないようdisactiveにする
             checkMateEvent();
             return true;
         }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using CommonConfig;
@@ -32,10 +30,10 @@ public class NPC : MonoBehaviour
     async void Update(){
         if(myColor == gameController.CurrentTurn & !thinking){
             thinking = true;
-            await UniTask.Delay(1500); //碁を置くのが速すぎると、1手前に置いた碁と衝突してしまうため少し待機させる
+            await UniTask.Delay(1500); //碁を置くのが速すぎると、1手前に置いた碁と盤上で衝突してしまうため少し待機する
             if(phaseJudgePoint.Any(item => boardController.CheckCanPut(item.x, item.z) <= item.limit 
                 & boardController.CheckCanPut(item.x, item.z) != BoardStatus.CanNotPut)){
-                    //主要な位置がすべて埋まっていない間を序盤と判断する
+                    //主要な位置がすべて埋まっていない間、序盤と判断する
                 nPCBehavior.earlyAction(boardController, myColor, rivalColor);
             }
             else if(boardController.VacantPos().Length > 32){
@@ -50,9 +48,8 @@ public class NPC : MonoBehaviour
     }
 }
 
-//NPCの挙動は序盤/中盤/終盤と局面に関係ない共通処理を切り替えるようにする
-//NPCクラスで局面を判断して、NPCBehaviorクラスの処理を呼び出すようにする
-//NPCBehaviorの処理は序盤/中盤/終盤/共通処理クラスの処理を組み合わせて作る
+//序盤/中盤/終盤/局面に関係ない共通処理を組み合わせてNPCの挙動を作る
+//組み合わせ方によりNPCのレベルを調整するようにする
 public class NPCBehavior
 {
     public delegate void NPCAction(BoardController boardController, int myColor, int rivalColor);
@@ -65,8 +62,8 @@ public class NPCBehavior
     private MiddleBehavior middleBehavior = new MiddleBehavior();
 
     public NPCBehavior(int level){
-        //おいおいNPCのレベル設定も追加したいので受け取った引数に応じて
-        //コンストラクタで振る舞いを切り替えるようにする
+        //NPCのレベル設定も追加したいので受け取った引数に応じて
+        //コンストラクタで振る舞いを切り替えられるようにする
         if(level == NPCLevel.EasyLevel){
             earlyAction += EarlyActionEasy;
             middleAction += MiddleActionEasy;
@@ -75,22 +72,28 @@ public class NPCBehavior
     }
 
     public void EarlyActionEasy(BoardController boardController, int myColor, int rivalColor){
-        //リーチラインの妨害を最優先とし、それ以外は主要ポジションを埋めに行く
+        //リーチラインの妨害を最優先とし、それ以外はゲームにおいて要となるポジションを埋めに行く
         (int x, int z)? candidatePos = null;
         GoSituations[] reachLines = boardController.HasLines(3);
+
         if(reachLines != null){
             GoSituations[] myReachLines = reachLines.Where(item => item.BoardStatus == myColor).ToArray();
             GoSituations[] rivalReachLines = reachLines.Where(item => item.BoardStatus == rivalColor).ToArray();
             if(myReachLines.Length > 0){
+                //自身のリーチラインに碁を置ける場合は最優先でチェックメイトしにいく
                 candidatePos = commonBehavior.PutReachLine(myReachLines, boardController);
             }
             if(candidatePos == null & rivalReachLines.Length > 0){
+                //相手のリーチラインがあればそのラインを止めに行く
                 candidatePos = commonBehavior.PutReachLine(rivalReachLines, boardController);
             }
         }
+
         if(candidatePos == null){
+            //特にチェックメイトにからむラインがなければ重要ポジションを埋める
             candidatePos = earlyBehavior.PutImportantPosition(boardController);
         }
+
         boardController.AddGo(candidatePos.Value.x, candidatePos.Value.z, myColor);
     }
 
@@ -99,6 +102,7 @@ public class NPCBehavior
         GoSituations[] single = boardController.HasLines(1);
         GoSituations[] preReachLines = boardController.HasLines(2);    
         GoSituations[] reachLines = boardController.HasLines(3);
+
         if(reachLines != null){
             GoSituations[] myReachLines = reachLines.Where(item => item.BoardStatus == myColor).ToArray();
             GoSituations[] rivalReachLines = reachLines.Where(item => item.BoardStatus == rivalColor).ToArray();
@@ -109,21 +113,30 @@ public class NPCBehavior
                 candidatePos = commonBehavior.PutReachLine(rivalReachLines, boardController);
             }
         }
+
+        //相手の2連ラインがあればそれを邪魔する
         if(candidatePos == null){
             GoSituations[] rivalPreReachLines = preReachLines.Where(item => item.BoardStatus == rivalColor).ToArray();
             candidatePos = middleBehavior.PutPreReachLine(rivalPreReachLines, boardController);
         }
+
+        //孤立している自身の碁があれば2連を作りに行く
         if(candidatePos == null){
             single = single.Where(item => item.BoardStatus == myColor).ToArray();
             candidatePos = middleBehavior.MakePreReachLine(single, boardController);
         }
+
+        //自身の2連ラインがあればリーチを作りに行く
         if(candidatePos == null){
             GoSituations[] myPreReachLines = preReachLines.Where(item => item.BoardStatus == myColor).ToArray();
             candidatePos = middleBehavior.PutPreReachLine(myPreReachLines, boardController);
         }
+
+        //上記いずれの処理も実行しなかった場合、ランダムな位置に置く
         if(candidatePos == null){
             candidatePos = commonBehavior.NoPlan(boardController.VacantPos());
         }
+
         boardController.AddGo(candidatePos.Value.x, candidatePos.Value.z, myColor);
     }
 
@@ -132,6 +145,7 @@ public class NPCBehavior
         GoSituations[] single = boardController.HasLines(1);
         GoSituations[] preReachLines = boardController.HasLines(2);    
         GoSituations[] reachLines = boardController.HasLines(3);
+
         if(reachLines != null){
             GoSituations[] myReachLines = reachLines.Where(item => item.BoardStatus == myColor).ToArray();
             GoSituations[] rivalReachLines = reachLines.Where(item => item.BoardStatus == rivalColor).ToArray();
@@ -142,30 +156,36 @@ public class NPCBehavior
                 candidatePos = commonBehavior.PutReachLine(rivalReachLines, boardController);
             }
         }
+
         if(candidatePos == null){
             GoSituations[] myPreReachLines = preReachLines.Where(item => item.BoardStatus == myColor).ToArray();
             candidatePos = middleBehavior.PutPreReachLine(myPreReachLines, boardController);
         }
+
         if(candidatePos == null){
             GoSituations[] rivalPreReachLines = preReachLines.Where(item => item.BoardStatus == rivalColor).ToArray();
             candidatePos = middleBehavior.PutPreReachLine(rivalPreReachLines, boardController);
         }
+
         if(candidatePos == null){
             single = single.Where(item => item.BoardStatus == myColor).ToArray();
             candidatePos = middleBehavior.MakePreReachLine(single, boardController);
         }
+
         if(candidatePos == null){
             candidatePos = commonBehavior.NoPlan(boardController.VacantPos());
         }
+
         boardController.AddGo(candidatePos.Value.x, candidatePos.Value.z, myColor);
     }
 }
 
 public class CommonBehavior
 {
-        public (int x, int z)? NoPlan(GoSituations[] vacantArray){
+    public (int x, int z)? NoPlan((int x, int z)[] vacantArray){
+        //いい手がない場合はランダムな位置に碁を置く
         int rndIndex = Random.Range(0, vacantArray.Length);
-        return (vacantArray[0].Positions[rndIndex].x, vacantArray[0].Positions[rndIndex].z);
+        return (vacantArray[rndIndex].x, vacantArray[rndIndex].z);
     }
 
     public (int x, int z)? PutReachLine(GoSituations[] reachLines, BoardController boardController){
@@ -183,6 +203,7 @@ public class CommonBehavior
 
 public class EarlyBehavior
 {
+    //5リーチにからめる12ポジションを埋めにいく
     private (int x, int z, int limit)[] checkPoint = GamePhaseJudge.EarlyPhasePoint;
 
     public (int x, int z) PutImportantPosition(BoardController boardController){
@@ -201,9 +222,6 @@ public class MiddleBehavior
         (int x, int z, int y)[] preReachPos = preReachLines.SelectMany(item => item.RestPos).ToArray();
         if(preReachPos != null){
             (int x, int z, int y)[] criticalPreReachPos = preReachPos.Where(item => item.y == boardController.CheckCanPut(item.x, item.z)).ToArray();
-        foreach((int x, int z, int y) i in criticalPreReachPos){
-            Debug.Log(i);
-        }
             if(criticalPreReachPos.Length != 0){
                 int rndIndex = Random.Range(0, criticalPreReachPos.Length);
                 return (criticalPreReachPos[rndIndex].x, criticalPreReachPos[rndIndex].z);
@@ -218,25 +236,18 @@ public class MiddleBehavior
     }
 
     public (int x, int z)? MakePreReachLine(GoSituations[] single, BoardController boardController){
-        GoSituations[] vacantGoSituations = boardController.VacantPos();
-        (int x, int z, int y)[] vacantPos = vacantGoSituations.SelectMany(item => item.Positions).ToArray();
+        //同色2連を作りに行く処理
+        //単独の碁と空きの位置を比べて次の手を提案する
+        (int x, int z)[] vacantXZPositions = boardController.VacantPos();
+        (int x, int z, int y)[] vacantPos = vacantXZPositions.Select(item => (x:item.x, z:item.z, y:boardController.CheckCanPut(item.x, item.z))).ToArray();
         (int x, int z, int y)[] candidatePos = single.SelectMany(item => item.RestPos).ToArray();
         candidatePos = candidatePos.Where(item => vacantPos.Contains(item)).ToArray();
         if(candidatePos.Length != 0){
             int rndIndex = Random.Range(0, candidatePos.Length);
-            foreach((int x, int z, int y) i in candidatePos){
-                //テスト用
-                Debug.Log(candidatePos);
-            }
             return (candidatePos[rndIndex].x, candidatePos[rndIndex].z);
         }
         else{
             return null;
         }
     }
-}
-
-public class LateBehavior
-{
-
 }

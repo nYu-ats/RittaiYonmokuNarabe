@@ -14,6 +14,7 @@ public class PutButton : MonoBehaviour
     private int goColor;
 
     void Start(){
+        //ボードに置く碁の色の初期設定
         if(gameController.Player == GameRule.FirstAttack){
             goColor = BoardStatus.GoWhite;
         }
@@ -25,7 +26,7 @@ public class PutButton : MonoBehaviour
     public void OnClicked(){
         playSE.PlaySound(AudioConfig.GoPutButtonIndex);
         boardController.AddGo(putPositionPanel.IndexXZ.x, putPositionPanel.IndexXZ.z, goColor);
-        //連続してクリックされるのを防ぐため初回クリック時にfalseにする
+        //連続してクリックされるのを防ぐため初回クリック時にボタンをfalseにする
         //自分のターンが回ってきたときにはGameControllerからtrueにされる
         this.GetComponent<Button>().enabled = false;
     }

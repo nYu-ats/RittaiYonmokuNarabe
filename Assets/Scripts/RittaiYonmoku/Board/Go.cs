@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Linq;
 using cakeslice;
 using CommonConfig;
@@ -14,6 +11,7 @@ public class Go : MonoBehaviour
 
 
     void Start(){
+        //instantiateされた後にリーチチェッカーを取得する
         reachChecker = GameObject.FindWithTag(Tags.InRittaiYonmoku.ReachChecker).GetComponent<ReachChecker>();
         reachChecker.hasReach += DisplayOutLine;
         DisplayOutLine(reachChecker.ReachPositions);

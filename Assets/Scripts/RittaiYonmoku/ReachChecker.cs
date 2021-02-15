@@ -1,18 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 
 public class ReachChecker : MonoBehaviour
 {
-    private (int x, int z, int y)[] reachPositions = new (int x, int z, int y)[]{};
-    public (int x, int z, int y)[] ReachPositions{get {return reachPositions;}}
     public delegate void HasReachEventHandler((int x, int z, int y)[] reachLines);
     public event HasReachEventHandler hasReach = ((int x, int z, int y)[] lines) => {};
     [SerializeField] BoardController boardController;
     [SerializeField] ReachViewButton reachViewButton;
+    private (int x, int z, int y)[] reachPositions = new (int x, int z, int y)[]{};
+    public (int x, int z, int y)[] ReachPositions{get {return reachPositions;}}
     private bool reachDisplayFlag = true;
+
     public bool ReachDisplayFlag{get{return reachDisplayFlag;}}
 
     void Start(){
@@ -25,6 +23,7 @@ public class ReachChecker : MonoBehaviour
         GoSituations[] tmpReachLines = boardController.HasLines(3);
         if(tmpReachLines != null){
             foreach(GoSituations go in tmpReachLines){
+                //次の手でチェックメイトとなりうる場合のみリーチとして画面に表示する
                 bool reachFlag = go.RestPos[0].y == boardController.CheckCanPut(go.RestPos[0].x, go.RestPos[0].z);
                 if(reachFlag){
                     foreach((int x, int z, int y) reachPos in go.Positions){

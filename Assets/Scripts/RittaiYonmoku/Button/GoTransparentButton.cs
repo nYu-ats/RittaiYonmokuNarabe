@@ -1,17 +1,21 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
 
-public class GoTransparentButton : MonoBehaviour
+interface IResetTransparent{
+    void ResetTransparent();
+}
+
+public class GoTransparentButton : MonoBehaviour, IResetTransparent
 {
+    //碁のマテリアルを直接操作して透過処理を行う
     [SerializeField] Material goMat;
-    private bool isTransparented = false;
-    private (float transparent, float normal) colorA = (transparent: 0.1f, normal:1.0f);
     [SerializeField] Image transparentedIcon;
     [SerializeField] Image normalIcon;
     [SerializeField] PlaySE playSE;
+    private bool isTransparented = false;
+    private (float transparent, float normal) colorA = (transparent: 0.1f, normal:1.0f);
+
 
     void Start(){
         goMat.color = new Color(goMat.color.r, goMat.color.g, goMat.color.b, colorA.normal);
@@ -21,6 +25,7 @@ public class GoTransparentButton : MonoBehaviour
 
     public void OnClicked(){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
+        //現在透過状態かそうでないかによって処理を切り分ける
         if(isTransparented){
             goMat.color = new Color(goMat.color.r, goMat.color.g, goMat.color.b, colorA.normal);
             transparentedIcon.enabled = false;

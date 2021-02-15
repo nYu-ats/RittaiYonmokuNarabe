@@ -11,7 +11,7 @@ public class GoGenerator : MonoBehaviour, IPutGo
     [SerializeField] float pointY; //碁を生成する高さ
     [SerializeField] Board board;
 
-    //碁を生成するためのXとZ座標の設定
+    //碁を生成するためのXとZ座標の位置を保持する
     private (float x, float z)[][] pointXZ = new (float, float)[][]{
         new(float, float)[]{(4.5f, 4.5f), (4.5f, 1.5f), (4.5f, -1.5f), (4.5f, -4.5f)},
         new(float, float)[]{(1.5f, 4.5f), (1.5f, 1.5f), (1.5f, -1.5f), (1.5f, -4.5f)},
@@ -20,7 +20,6 @@ public class GoGenerator : MonoBehaviour, IPutGo
         };
 
     public void PutGo(int xIndex, int zIndex, int yIndex, int addColor){
-        //碁を盤上に出現させる処理
         float pointX = pointXZ[xIndex][zIndex].x;
         float pointZ = pointXZ[xIndex][zIndex].z;
         GameObject putGo = null;

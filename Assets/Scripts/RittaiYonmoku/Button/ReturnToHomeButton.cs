@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using CommonConfig;
@@ -13,11 +10,13 @@ public class ReturnToHomeButton : MonoBehaviour
     [SerializeField] PlaySE playSE;
     public async void OnClicked(){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
-        await UniTask.Run(async () => {
-            await connectFirebase.DeleteGameRoom();
-        });
-        Time.timeScale = 1; //タイムスケールを元に戻す
-        this.GetComponent<Button>().enabled = false; //ホームに戻る前にdisableに戻す
+        //マルチプレイの時はホームに戻る前にFirebase上のゲームルームを削除する
+        if(gameController.PlayMode == GameRule.MultiPlayMode){
+            await UniTask.Run(async () => {
+                await connectFirebase.DeleteGameRoom();
+            });
+        }
+        Time.timeScale = 1; //ホーム画面に戻る前にタイムスケールを元に戻す
         SceneManager.LoadScene(GameSceneName.HomeScene);
     }
 }

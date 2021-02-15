@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 interface IRollCamera{
-    //ユーザーの入力を受けて、カメラを回転させるためのインターフェース
     void RollCamera(Vector2 interval);
 }
 
@@ -42,7 +39,7 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
 
 
     private void UpdateCamerPos(float radius, float theta, float phi){
-        //カメラポジションを更新する
+        //視点を更新する
         float posX = radius * Mathf.Cos(theta * Mathf.PI / 180.0f) * Mathf.Sin(phi * Mathf.PI / 180.0f);
         float posY = radius * Mathf.Sin(theta * Mathf.PI / 180.0f);
         float posZ = radius * Mathf.Cos(theta * Mathf.PI / 180.0f) * Mathf.Cos(phi * Mathf.PI / 180.0f);
@@ -51,16 +48,15 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
     }
 
     public void InitializeCameraPos(){
-        //カメラポジションの初期化
+        //視点の初期化
         tmpTheta = initialTheata;
         tmpPhi = initialPhi;
         tmpRadius = initialRadius;
         UpdateCamerPos(tmpRadius, initialTheata, initialPhi);
     }
 
-
     public void RollCamera(Vector2 interval){
-        //カメラ視点回転実装
+        //視点回転
         tmpPhi += interval.x * fitPhiChange;
         tmpTheta += (-interval.y) * fitThetaChange; //上下の移動はスクロール方向と逆にする
         //thetaが規定範囲を超えた場合は、規定値内に補正
@@ -74,7 +70,7 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
     }
 
     public void PinchInOut(float percentage){
-        //カメラのピンチインピンチアウト実装
+        //視点のピンチインピンチアウト
         tmpRadius *= percentage * fitRadiusChange;
         if(tmpRadius< (float)RadiusRange.Min){
             tmpRadius = (float)RadiusRange.Min;

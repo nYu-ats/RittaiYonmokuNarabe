@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
 using Cysharp.Threading.Tasks;
@@ -9,14 +6,15 @@ using CustomException;
 
 public class SyncBoardStatus : MonoBehaviour
 {
+    //相手が降参したことを通知するイベント
+    public delegate void RivalGiveUpEventHandler();
+    public event RivalGiveUpEventHandler rivalGiveUp = () => {}; 
+
     [SerializeField] BoardController boardController;
     [SerializeField] GameController gameController;
     [SerializeField] ConnectFirebase connectFirebase;
-    [SerializeField] GameObject gameResultPanel;
     [SerializeField] TimeCountPanel timeCountPanel;
     [SerializeField] Text connectingText;
-    public delegate void RivalGiveUpEventHandler();
-    public event RivalGiveUpEventHandler rivalGiveUp = () => {}; 
     void Start(){
         gameController.setUpComplete += InitializeSyncStatus;
     }
@@ -55,13 +53,11 @@ public class SyncBoardStatus : MonoBehaviour
             });
         }
         catch (GiveUpSignalReceive){
-            gameController.CurrentTurn = gameController.Player; //相手がギブアップしたので勝者は自分に設定する
+            //相手がギブアップした場合の処理
+            gameController.CurrentTurn = gameController.Player;
             boardController.boardUpdated -= SyncBoard;
             timeCountPanel.SwitchTimeCountStatus(false);
             rivalGiveUp();
-            /*
-            gameResultPanel.SetActive(true);
-            */
         }
         finally{
             connectingText.enabled = false;
@@ -69,6 +65,8 @@ public class SyncBoardStatus : MonoBehaviour
     }
 
     public void GiveUpAction(){
+        //自身が降参した時の処理
+        //Firebaseに降参用のゲームステータスをセットする
         connectingText.enabled = true;
         UniTask.Create(async () => {
             boardController.boardUpdated -= SyncBoard;

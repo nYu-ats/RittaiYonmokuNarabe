@@ -16,11 +16,13 @@ interface ICheckCanPut{
 }
 
 interface IHasLines{
+    //連続して置かれている碁を確認する
     GoSituations[] HasLines(int checkCount);
 }
 
 interface IVacantPos{
-    GoSituations[] VacantPos();
+    //空の座標を確認する
+    (int x, int z)[] VacantPos();
 }
 
 public class GoSituations
@@ -28,10 +30,12 @@ public class GoSituations
     //空き/白/黒の各状態の情報を格納するクラス
     private (int x, int z, int y)[] positions;
     public (int x, int z, int y)[] Positions{get {return positions;}}
-    private int boardStatus;
+    private int boardStatus; //白か黒か空かを格納
     public int BoardStatus{get {return boardStatus;}}
-    private int pattern;
+    private int pattern; //ラインのパターンを格納
     public int Pattern{get {return pattern;}}
+    //各パターンごとにチェックメイトとなりうる座標がある
+    //それを格納する配列
     private (int x, int z, int y)[] restPos = new (int x, int z, int y)[3];
     public (int x, int z, int y)[] RestPos{get {return restPos;}} //参照する時は配列をまとめて取得する
     public (int x, int z, int y) this[int i]{
@@ -70,10 +74,10 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
     }
     private void RandomPut(){
         //制限時間を過ぎた場合には適当な場所に碁を置く
-        GoSituations[] canPutPos = VacantPos();
+        (int x, int z)[] canPutPos = VacantPos();
         if(canPutPos != null){
             int rndIndex = UnityEngine.Random.Range(0, canPutPos.Length);
-            AddGo(canPutPos[rndIndex].Positions[0].x, canPutPos[rndIndex].Positions[0].z, gameController.CurrentTurn);
+            AddGo(canPutPos[rndIndex].x, canPutPos[rndIndex].z, gameController.CurrentTurn);
         }
     }
 
@@ -92,35 +96,35 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
         }
     }
 
-    public GoSituations[] VacantPos(){
+    public (int x, int z)[] VacantPos(){
         //ボードの空き状況を調べる
         (int x, int z, int y)[] vacantArray = board.posArray.Select((item, index) => new {Index = index, Value = item})
                                               .Where(item => board.boardStatusArray[item.Index] == BoardStatus.Vacant).Select(item => item.Value).ToArray();
         //抜き出した空ポジションから返却用のオブジェクトを作る
-        GoSituations[] vacantPos = new GoSituations[vacantArray.Length];
+        (int x, int z)[] vacantPos = new (int x, int z)[vacantArray.Length];
         for(int index = 0; index < vacantArray.Length; index++){
-            vacantPos[index] = new GoSituations(vacantArray, BoardStatus.Vacant, LinePattern.Pattern0);
+            vacantPos[index] = (vacantArray[index].x, vacantArray[index].z);
             //vacantPos[index] = tmpReachLine;
         }
         return vacantPos;
     }
 
+    //ラインチェック流れ
+    //碁の色で絞り込む->リーチパターンに応じてフィルターをかける->碁の状態オブジェクトを生成
     public GoSituations[] HasLines(int checkCount){
         try{
             //黒のラインチェック
             //黒の碁が置かれている座標を取得
-            (int x, int z, int y)[] blackCandidatehXY = 
-            board.posArray.Select((item, index) => new {Index = index, Value = item})
-            .Where(item => board.boardStatusArray[item.Index] == BoardStatus.GoBlack)
-            .Select(item => item.Value).ToArray();
+            (int x, int z, int y)[] blackCandidatehXY = board.posArray.Select((item, index) => new {Index = index, Value = item})
+            　　　　　　　　　　　　　　　　　　　　　　　　.Where(item => board.boardStatusArray[item.Index] == BoardStatus.GoBlack)
+            　　　　　　　　　　　　　　　　　　　　　　　　.Select(item => item.Value).ToArray();
             //絞り込んだ座標の中から指定の数の碁が並んでいるラインを抽出する
             GoSituations[] blackReachLines = SearchLines(blackCandidatehXY, BoardStatus.GoBlack, checkCount);
 
             //白のラインチェック
-            (int x, int z, int y)[] whiteCandidatehXY = 
-            board.posArray.Select((item, index) => new {Index = index, Value = item})
-            .Where(item => board.boardStatusArray[item.Index] == BoardStatus.GoWhite)
-            .Select(item => item.Value).ToArray();
+            (int x, int z, int y)[] whiteCandidatehXY = board.posArray.Select((item, index) => new {Index = index, Value = item})
+            　　　　　　　　　　　　　　　　　　　　　　　　.Where(item => board.boardStatusArray[item.Index] == BoardStatus.GoWhite)
+            　　　　　　　　　　　　　　　　　　　　　　　　.Select(item => item.Value).ToArray();
             GoSituations[] whiteReachLines = SearchLines(whiteCandidatehXY, BoardStatus.GoWhite, checkCount);
 
             //白と黒のラインを結合
@@ -139,71 +143,86 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
     }
 
     private GoSituations[] SearchLines((int x, int z, int y)[] candidatePos, int color, int checkCount){
-        //リーチになりうる条件を元に、既定数連続して置かれている碁の座標を探る
+        //リーチになりうる条件7パターンを元に、指定の数の碁が連続して置かれている座標を探る
+        //1 - 7まで順次調査をしながら、条件に合致したら配列を結合していく
         try{
             GoSituations[] reachLines = new GoSituations[0]{};
             //条件1 : XとY座標が変化しないライン
+            //XとYでグループ化
             (int x, int z, int y)[] reachXY = candidatePos.GroupBy(item => new { PosX = item.x, PosY = item.y})
-            .Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
+            　　　　　　　　　　　　　　　　　　　.Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachXY, color, checkCount, LinePattern.Pattern1)).ToArray(); //Concat使う場合、代入が必要なので注意
 
             //条件2 : ZとY座標が変化しないライン
+            //ZとYでグループ化
             (int x, int z, int y)[] reachZY = candidatePos.GroupBy(item => new { PosZ = item.z, PosY = item.y})
-            .Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
+                                              .Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachZY, color, checkCount, LinePattern.Pattern2)).ToArray();
 
             //条件3 : XとZ座標が同じライン
+            //XとZでグループ化
             (int x, int z, int y)[] reachXZ = candidatePos.GroupBy(item => new { PosX = item.x, PosZ = item.z})
-            .Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
+                                              .Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachXZ, color, checkCount, LinePattern.Pattern3)).ToArray();
 
             //条件4 : X座標が変化せずYとZ座標が異なる(1ずつ上昇もしくは下降する)
             //Z正方向に上昇するパターン
+            //YとZ座標が同値でフィルターをかけたうえでXでグループ化
             (int x, int z, int y)[] reachDiagonalX1 = candidatePos.Where(item => item.y == item.z)
-            .GroupBy(item => item.x).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
-            //Z正方向に下降するパターン
-            (int x, int z, int y)[] reachDiagonalX2 = candidatePos.Where(item => (3 - item.y) == item.z)
-            .GroupBy(item => item.x).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
+
+                                                      .GroupBy(item => item.x).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonalX1, color, checkCount, LinePattern.Pattern4)).ToArray();
+            //Z正方向に下降するパターン
+            //3-YとZが同値でフィルターをかけたうえでXでグループ化
+            (int x, int z, int y)[] reachDiagonalX2 = candidatePos.Where(item => (3 - item.y) == item.z)
+                                                      .GroupBy(item => item.x).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonalX2, color, checkCount, LinePattern.Pattern4)).ToArray();
 
             //条件5 : Z座標が変化せずXとY座標が異なる(1ずつ上昇もしくは下降する)
             //X正方向に上昇するパターン
+            //XとY座標が同値でフィルターをかけたうえでZでグループ化
             (int x, int z, int y)[] reachDiagonalZ1 = candidatePos.Where(item => item.x == item.y)
-            .GroupBy(item => item.z).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
-            //X正方向に下降するパターン
-            (int x, int z, int y)[] reachDiagonalZ2 = candidatePos.Where(item => (3 - item.y) == item.x)
-            .GroupBy(item => item.z).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
+                                                      .GroupBy(item => item.z).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonalZ1, color, checkCount, LinePattern.Pattern5)).ToArray();
+            //X正方向に下降するパターン
+            //3-YとXが同値でフィルターをかけたうえでZでグループ化
+            (int x, int z, int y)[] reachDiagonalZ2 = candidatePos.Where(item => (3 - item.y) == item.x)
+                                                      .GroupBy(item => item.z).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonalZ2, color, checkCount, LinePattern.Pattern5)).ToArray();
 
             //条件6 : Y座標が変化せずXとZ座標が異なる(1ずつ上昇もしくは下降する)
             //XZ平面で右肩上がり
+            //XとZ座標が同値でフィルターをかけたうえでYでグループ化
             (int x, int z, int y)[] reachDiagonalY1 = candidatePos.Where(item => item.x == item.z)
-            .GroupBy(item => item.y).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
-            //XZ平面で右肩下がり
-            (int x, int z, int y)[] reachDiagonalY2 = candidatePos.Where(item => (3 - item.z) == item.x)
-            .GroupBy(item => item.y).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
+                                                      .GroupBy(item => item.y).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonalY1, color, checkCount, LinePattern.Pattern6)).ToArray();
+            //XZ平面で右肩下がり
+            //3-ZとXが同値でフィルターをかけたうえでYでグループ化
+            (int x, int z, int y)[] reachDiagonalY2 = candidatePos.Where(item => (3 - item.z) == item.x)
+                                                      .GroupBy(item => item.y).Where(item => item.Count() == checkCount).SelectMany(item => item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonalY2, color, checkCount, LinePattern.Pattern6)).ToArray();
 
             //条件7 : X,Y,Z座標いずれも異なる(1ずつ上昇もしくは下降する)
-            //この条件に限っては、1ラインずつ探っていくのでWhere内でのCountでの絞り込みは必要ない
+            //この条件に限っては、1ラインずつ探っていくのでWhere内でのCountでの絞り込む必要はない
             //(3, 3, 3)へ向けて上昇
+            //X==Y==Zとなる
             (int x, int z, int y)[] reachDiagonal1 = candidatePos.Where(item => (item.x == item.y) && (item.z == item.y))
-            .Select(item =>item).ToArray();
-            //(0, 0, 3)へ向けて上昇
-            (int x, int z, int y)[] reachDiagonal2 = candidatePos.Where(item => (item.x == (3 - item.y)) && (item.z == (3 - item.y)))
-            .Select(item =>item).ToArray();        
-            //(0, 3, 3)へ向けて上昇
-            (int x, int z, int y)[] reachDiagonal3 = candidatePos.Where(item => ((3 - item.x) == item.y) && (item.z == item.y))
-            .Select(item =>item).ToArray();        
-            //(3, 3, 0)へ向けて上昇
-            (int x, int z, int y)[] reachDiagonal4 = candidatePos.Where(item => (item.x == item.y) && ((3 - item.z) == item.y))
-            .Select(item =>item).ToArray();        
+                                                     .Select(item =>item).ToArray();
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonal1, color, checkCount, LinePattern.Pattern7)).ToArray();
+            //(0, 0, 3)へ向けて上昇
+            //X==(3-Y)==Zとなる
+            (int x, int z, int y)[] reachDiagonal2 = candidatePos.Where(item => (item.x == (3 - item.y)) && (item.z == (3 - item.y)))
+                                                     .Select(item =>item).ToArray();        
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonal2, color, checkCount, LinePattern.Pattern7)).ToArray();
+            //(0, 3, 3)へ向けて上昇
+            //(3-X)==Y==Zとなる
+            (int x, int z, int y)[] reachDiagonal3 = candidatePos.Where(item => ((3 - item.x) == item.y) && (item.z == item.y))
+                                                     .Select(item =>item).ToArray();        
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonal3, color, checkCount, LinePattern.Pattern7)).ToArray();
+            //(3, 3, 0)へ向けて上昇
+            //X==Y==(3-Z)となる
+            (int x, int z, int y)[] reachDiagonal4 = candidatePos.Where(item => (item.x == item.y) && ((3 - item.z) == item.y))
+                                                     .Select(item =>item).ToArray();        
             reachLines = reachLines.Concat(MakeLineArray(reachDiagonal4, color, checkCount, LinePattern.Pattern7)).ToArray();
 
             return reachLines;
@@ -214,35 +233,34 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
     }
 
     private GoSituations[] MakeLineArray((int x, int z, int y)[] candidatePos, int color, int checkCount, int linePatten){
+        //指定されている碁が連続している数の倍数分だけ候補がある時のみ配列を生成する
         if(candidatePos.Length % checkCount == 0){
-            //指定されている碁が連続している数の倍数分だけ候補がある時のみSituations配列を生成する
             GoSituations[] goSituations = new GoSituations[candidatePos.Length / checkCount];
+            //調査している碁の連続数に応じて排列を切り出す
             for(int index = 0; index < candidatePos.Length / checkCount; index++){
                 GoSituations tmpGoSituation = new GoSituations(candidatePos.Skip(index * checkCount).Take(checkCount).ToArray(), color, linePatten); //リーチラインの切り出し
-                if(checkCount <= 3){
-                    //3連(リーチ)チェックの場合のみチェックメイトになるうる座標の設定処理をする
-                    SetCheckMatePos(tmpGoSituation);
-                }
+                SetCheckMatePos(tmpGoSituation);
                 goSituations[index] = tmpGoSituation;
             }
             return goSituations;
         }
         else{
-            //定されている碁が連続している数の倍数分だけ候補がなかった場合は、空の配列を返す
+            //指定の連続数の倍数と配列の長さの対応が誤っていた場合は空の配列を返す
             return new GoSituations[0]{};
         }
     }
 
+    private int[] lineIndex = new int[4]{0, 1, 2, 3};
     private void SetCheckMatePos(GoSituations threeGoSituation){
-        //LinePatterの値を定数として取得できず、switchが使えないためif文で書く
-        int[] lineIndex = new int[]{0, 1, 2, 3};
+        //各リーチラインのパターン次応じて、チェックメイトになりうる碁の座標を探る
+        //LinePattenの値を定数として取得できず、switchが使えないためif文で書いていく
         if(threeGoSituation.Pattern == LinePattern.Pattern1){
             //X座標は固定なラインなのでZ座標を0-3まで移動させながらY座標の状態を調査する
             int thisIndexX = threeGoSituation.Positions[0].x;
             int thisIndexY = threeGoSituation.Positions[0].y;
             int[] tmpIndexZ = lineIndex.Select((index, item) => new {IndexY = CheckCanPut(thisIndexX, index), IndexZ = item})
-            .Where(item => item.IndexY <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
-            .Select(item => item.IndexZ).ToArray(); //対象ラインの中にチェックメイトになりうる空きポジションがなければnullを返す
+                              .Where(item => item.IndexY <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
+                              .Select(item => item.IndexZ).ToArray(); //対象ラインの中にチェックメイトになりうる空きポジションがなければnullを返す
             if(tmpIndexZ != null){
                 for(int index = 0; index < tmpIndexZ.Length; index++){
                     threeGoSituation[index] = (x: thisIndexX, z: tmpIndexZ[index], y: thisIndexY);
@@ -254,8 +272,8 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             int thisIndexZ = threeGoSituation.Positions[0].z;
             int thisIndexY = threeGoSituation.Positions[0].y;
             int[] tmpIndexX = lineIndex.Select((index, item) => new {IndexY = CheckCanPut(index, thisIndexZ), IndexX = item})
-            .Where(item => item.IndexY <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
-            .Select(item => item.IndexX).ToArray(); //対象ラインの中にチェックメイトになりうる空きポジションがなければnullを返す
+                              .Where(item => item.IndexY <= thisIndexY & item.IndexY != BoardStatus.CanNotPut)
+                              .Select(item => item.IndexX).ToArray();
             if(tmpIndexX != null){
                 for(int index = 0; index < tmpIndexX.Length; index++){
                     threeGoSituation[index] = (x: tmpIndexX[index], z: thisIndexZ, y: thisIndexY);
@@ -263,14 +281,14 @@ public class BoardController : MonoBehaviour, IAddGo, ICheckCanPut, IHasLines, I
             }
         }
         else if(threeGoSituation.Pattern == LinePattern.Pattern3){
-            //XとZが固定なのでYの空座標を取得するのみで碁が置けないという状況(null)も発生しない
+            //XとZが固定なのでYの空座標を取得するのみで碁が置けないという状況は発生しない
             int thisIndexX = threeGoSituation.Positions[0].x;
             int thisIndexZ = threeGoSituation.Positions[0].z;
             int tmpIndexY = CheckCanPut(thisIndexX, thisIndexZ);
             if(tmpIndexY != BoardStatus.CanNotPut){
                 threeGoSituation[0] = (x: thisIndexX, z:thisIndexZ, y: tmpIndexY);
                 if(tmpIndexY == 2){
-                    //2連チェックの場合のみ2つめの空座標を格納する
+                    //2連チェックの場合のみ2つめの空き座標を格納する
                     threeGoSituation[1] = (x: thisIndexX, z:thisIndexZ, y: tmpIndexY+1);
                 }
             }

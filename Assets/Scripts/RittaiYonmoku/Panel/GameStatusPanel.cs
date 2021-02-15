@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using Cysharp.Threading.Tasks;
 using CommonConfig;
 
@@ -29,7 +26,7 @@ public class GameStatusPanel : MonoBehaviour
         .ContinueWith(() => gameResultPanel.SetActive(true)); //ゲームリザルトを表示するまで数秒間をあける
         gameController.checkMateEvent -= DisplayCheckMate;
         if(gameController.PlayMode == GameRule.MultiPlayMode){
-            syncBoardStatus.rivalGiveUp += RivalGiveUp;
+            syncBoardStatus.rivalGiveUp -= RivalGiveUp;
         }
     }
 
@@ -40,7 +37,7 @@ public class GameStatusPanel : MonoBehaviour
         .ContinueWith(() => gameResultPanel.SetActive(true));
         gameController.checkMateEvent -= DisplayCheckMate;
         if(gameController.PlayMode == GameRule.MultiPlayMode){
-            syncBoardStatus.rivalGiveUp += RivalGiveUp;
+            syncBoardStatus.rivalGiveUp -= RivalGiveUp;
         }
     }
 

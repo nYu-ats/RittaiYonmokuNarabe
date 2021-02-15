@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using Firebase;
 using Firebase.Database;
 using FirebaseChildKey;
 using CustomException;

@@ -1,26 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
 
 /*
-インスペクター上ではX、Z座標を並べた文字列を各ボタンの名前として設定
+インスペクター上ではX、Z座標を連結した文字列を各ボタンの名前として設定
 */
 
 public class PutPositionPanel : MonoBehaviour
 {
+    //各棒のアウトラインを更新するためのイベント
+    public delegate void PanelUpdatedEventHandler(int x, int z);
+    public event PanelUpdatedEventHandler panelUpdated = (int x, int z) => {};
+
     [SerializeField] Image CurosrImg;
     [SerializeField] CameraMover cameraMover;
     [SerializeField] PutPositionButton[] putPositionButton;
     [SerializeField] BoardController boardController;
     private (int x, int z) indexXZ = (0, 0);
-    public (int x, int z) IndexXZ{get {return indexXZ;}} //置くボタンからアクセスするためのプロパティ
-    public delegate void PanelUpdatedEventHandler(int x, int z);
-    public event PanelUpdatedEventHandler panelUpdated = (int x, int z) => {};
+    public (int x, int z) IndexXZ{get {return indexXZ;}}
 
     public void Start(){
-        //各ボタンにクリック時の呼び出されるイベントのハンドラー追加
+        //各ボタンクリック時に呼び出されるイベントのハンドラー追加
         foreach(PutPositionButton btn in putPositionButton){
             btn.selectedStatusUpdate += SelectedPositionUpdate;
         }
@@ -33,7 +33,7 @@ public class PutPositionPanel : MonoBehaviour
 
     public void SelectedPositionUpdate(int indexX, int indexZ){
         if(boardController.CheckCanPut(indexX, indexZ) == BoardStatus.CanNotPut){
-            //すでに4つの碁が置かれている棒には移動できないようにする
+            //すでに4つの碁が置かれている座標は選択できないようにする
             return;
         }
         else{

@@ -1,10 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using CommonConfig;
 public class ReachViewButton : MonoBehaviour
 {
+    //ターンに関わらず任意のタイミングでon/offできるようにするため
+    //切替ボタンが押されたらeventを発生させる
     public delegate void ReachDisplaySwitchEventHandler();
     public event ReachDisplaySwitchEventHandler switchEvent = () => {};
     [SerializeField] Text reachOnText;
@@ -15,7 +15,7 @@ public class ReachViewButton : MonoBehaviour
 
     void Start(){
         currentFlag = true;
-        reachOnText.enabled = true;
+        reachOnText.enabled = currentFlag;
         reachOffText.enabled = false;
     }
 
@@ -26,6 +26,7 @@ public class ReachViewButton : MonoBehaviour
     }
 
     private void SwitchText(bool status){
+        //リーチ表示のon/offが切り替わったらText自体を差し替える
         currentFlag = !status;
         reachOnText.enabled = !status;
         reachOffText.enabled = status;

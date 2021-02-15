@@ -3807,11 +3807,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   winnerText: {fileID: 395647987}
-  numberOfMove: {fileID: 1506837934}
+  moveCountText: {fileID: 1506837934}
   gameController: {fileID: 1703375494}
   connectFirebase: {fileID: 1079850346}
   ReturnToHomeButton: {fileID: 176477540}
   connectingText: {fileID: 1885500225}
+  whoWin: "\u52DD\u8005 : "
+  moveCount: "\u624B"
 --- !u!114 &828913616
 MonoBehaviour:
   m_ObjectHideFlags: 0

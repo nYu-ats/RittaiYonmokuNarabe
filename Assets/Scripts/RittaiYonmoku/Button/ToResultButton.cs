@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using CommonConfig;
+﻿using UnityEngine;
 using CommonConfig;
 public class ToResultButton : MonoBehaviour
 {
@@ -13,12 +10,13 @@ public class ToResultButton : MonoBehaviour
 
     public void OnClicked(){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
-        //ギブアップは自身のターンにしかできないため、ゲームリザルトに相手を勝者としてセットする
+        //ゲームリザルトにはCrrentTurnのユーザーを勝者として表示するようになっており
+        //ギブアップは自身のターンにしかできないため、CurrentTurnを相手に更新する
         gameController.CurrentTurn += gameController.Rival;
         gameResultPanel.SetActive(true);
         giveUpConfirmPanel.SetActive(false);
         if(gameController.PlayMode == GameRule.MultiPlayMode){
-            //マルチプレイの場合は相手にギブアップ通知をする
+            //マルチプレイの場合は相手にギブアップを通知をする
             syncBoardStatus.GiveUpAction();
         }
     }
