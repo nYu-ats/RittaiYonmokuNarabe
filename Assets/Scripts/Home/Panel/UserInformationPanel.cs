@@ -8,7 +8,7 @@ public class UserInformationPanel : MonoBehaviour
     [SerializeField] Text winText;
     [SerializeField] Text loseText;
     [SerializeField] Text userNameText;
-    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] FirebaseUpdateRecordFunc firebaseUpdateRecord;
     private string attachToUserNameText = "さんの戦績";
     async void Start()
     {
@@ -25,7 +25,7 @@ public class UserInformationPanel : MonoBehaviour
     private async UniTask SetWinLoseCount(string userName){
         //ユーザー名をキーにしてFirebaseから勝敗の履歴を取得する
         await UniTask.Run(async () => {
-            GameRecord winLose = await connectFirebase.GetRecord(userName);
+            GameRecord winLose = await firebaseUpdateRecord.GetRecord(userName);
             return winLose;
         }).ContinueWith(winLose => {
             winText.text = winLose.win.ToString();

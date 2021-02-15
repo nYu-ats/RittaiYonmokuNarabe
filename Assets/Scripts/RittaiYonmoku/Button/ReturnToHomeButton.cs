@@ -5,7 +5,7 @@ using CommonConfig;
 
 public class ReturnToHomeButton : MonoBehaviour
 {
-    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] FirebaseCloseGameFunc firebaseCloseGame;
     [SerializeField] GameController gameController;
     [SerializeField] PlaySE playSE;
     public async void OnClicked(){
@@ -13,7 +13,7 @@ public class ReturnToHomeButton : MonoBehaviour
         //マルチプレイの時はホームに戻る前にFirebase上のゲームルームを削除する
         if(gameController.PlayMode == GameRule.MultiPlayMode){
             await UniTask.Run(async () => {
-                await connectFirebase.DeleteGameRoom();
+                await firebaseCloseGame.DeleteGameRoom();
             });
         }
         Time.timeScale = 1; //ホーム画面に戻る前にタイムスケールを元に戻す

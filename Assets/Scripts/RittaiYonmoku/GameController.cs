@@ -16,7 +16,7 @@ public class GameController : MonoBehaviour
     [SerializeField] TimeCountPanel timeCount;
     [SerializeField] GameObject connectFailedPanel;
     [SerializeField] GameObject npc;
-    [SerializeField] GameObject connectFirebase;
+    [SerializeField] GameObject[] firebaseFucntions; //ソロプレイ時はfirebase関連オブジェクトをfalseにしたいのでGameObjectでセットする
     [SerializeField] GameObject syncboard;
     [SerializeField] UserNamePanel userNamePanel;
     [SerializeField] Text connectingText;
@@ -65,7 +65,10 @@ public class GameController : MonoBehaviour
     private async UniTask SetUpGame(){
         if(playMode == GameRule.SoloPlayMode){
             connectingText.enabled = false;
-            connectFirebase.SetActive(false);
+            //ソロプレイ時はfirebase関連のオブジェクトをfalseにする
+            foreach(GameObject obj in firebaseFucntions){
+                obj.SetActive(false);
+            }
             syncboard.SetActive(false);
             npc.SetActive(true);
             rivalName = "NPC";
@@ -73,14 +76,14 @@ public class GameController : MonoBehaviour
         else{
             npc.SetActive(false);
             connectingText.enabled = true;
-            await connectFirebase.GetComponent<ConnectFirebase>().SetGameRoom(gameRoom, player);
+            FirebaseSetUpGameFunc firebaseSetUpGame = firebaseFucntions[0].GetComponent<FirebaseSetUpGameFunc>();
+            await firebaseSetUpGame.SetGameRoom(gameRoom, player);
             try{
-                rivalName = await connectFirebase.GetComponent<ConnectFirebase>().GetRivalName(gameRoom, rival);
+                rivalName = await firebaseSetUpGame.GetRivalName(gameRoom, rival);
             }
             catch (TimeoutException){
                 connectFailedPanel.SetActive(true);
             }
-            connectFirebase.SetActive(true);
             syncboard.SetActive(true);
             connectingText.enabled = false;
             setUpComplete();

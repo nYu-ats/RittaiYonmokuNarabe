@@ -4,7 +4,8 @@ using CommonConfig;
 
 public class RegisterButton : MonoBehaviour
 {
-    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] FirebaseUserRgisterFunc firebaseUserRegister;
+    [SerializeField] FirebaseUpdateRecordFunc firebaseUpdateRecord;
     [SerializeField] PlaySE playSE;
     public string inputUserName = "";
     private bool validFlag = false;
@@ -26,13 +27,13 @@ public class RegisterButton : MonoBehaviour
         connectingEvent(true); //通信処理に入る直前に通信中メッセージを表示する
         fetchUserNameEvent();
         await UniTask.Run(async() => {
-            validFlag = await connectFirebase.UserNameValidation(inputUserName);
+            validFlag = await firebaseUserRegister.UserNameValidation(inputUserName);
             return validFlag;
         }).ContinueWith(async flag => {
         if(flag){
-            await connectFirebase.SetUserName(inputUserName);
+            await firebaseUserRegister.SetUserName(inputUserName);
             PlayerPrefs.SetString(PlayerPrefsKey.UserNameKey, inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
-            await connectFirebase.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 0, 0); //初回なので勝敗共に0
+            await firebaseUpdateRecord.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 0, 0); //初回なので勝敗共に0
             connectingEvent(false);
         }
         else{

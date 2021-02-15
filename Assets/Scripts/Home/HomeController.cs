@@ -37,9 +37,12 @@ public class HomeController : MonoBehaviour
     }
 
     private void DisplayHomePanel(){
-        //初回起動時に音量1/2で設定する
+        //初回起動時に音量中で設定する
         if(!PlayerPrefs.HasKey(PlayerPrefsKey.VolumeKey)){
             PlayerPrefs.SetInt(PlayerPrefsKey.VolumeKey, 1);
+        }
+        if(!PlayerPrefs.HasKey(PlayerPrefsKey.BgmVolumeKey)){
+            PlayerPrefs.SetInt(PlayerPrefsKey.BgmVolumeKey, 1);
         }
         userRegisterPanel.SetActive(false);
         homePanel.SetActive(true);

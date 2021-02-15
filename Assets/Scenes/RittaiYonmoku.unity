@@ -311,7 +311,7 @@ Transform:
   - {fileID: 1222661990}
   - {fileID: 996335520}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &110369722
 GameObject:
@@ -357,6 +357,50 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraMover: {fileID: 1225597285}
+--- !u!1 &131649942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 131649944}
+  - component: {fileID: 131649943}
+  m_Layer: 0
+  m_Name: CloseGame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &131649943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131649942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48f7c34da22ff1547a1167a7e266ddd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameController: {fileID: 1703375494}
+--- !u!4 &131649944
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 131649942}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 19
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &176477537
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,7 +453,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93dc419021d2af349af1ceed3c1b9775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectFirebase: {fileID: 1079850346}
+  firebaseCloseGame: {fileID: 131649943}
   gameController: {fileID: 1703375494}
   playSE: {fileID: 1114165571}
 --- !u!114 &176477540
@@ -931,7 +975,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93dc419021d2af349af1ceed3c1b9775, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  connectFirebase: {fileID: 1079850346}
+  firebaseCloseGame: {fileID: 0}
   gameController: {fileID: 1703375494}
   playSE: {fileID: 1114165571}
 --- !u!114 &294701240
@@ -1054,7 +1098,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &344092253
 MonoBehaviour:
@@ -1070,10 +1114,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardController: {fileID: 713595363}
   gameController: {fileID: 1703375494}
-  connectFirebase: {fileID: 1079850346}
-  gameResultPanel: {fileID: 828913613}
+  firebaseUpdateBoard: {fileID: 1159253327}
   timeCountPanel: {fileID: 615787960}
   connectingText: {fileID: 1885500225}
+--- !u!1 &349905334
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 349905336}
+  - component: {fileID: 349905335}
+  m_Layer: 0
+  m_Name: UpdateRecord
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &349905335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 349905334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7729a195db2b7f4089a639244169cb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &349905336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 349905334}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 20
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &360762094
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1906,7 +1992,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 17
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &503713403
 MonoBehaviour:
@@ -3809,7 +3895,7 @@ MonoBehaviour:
   winnerText: {fileID: 395647987}
   moveCountText: {fileID: 1506837934}
   gameController: {fileID: 1703375494}
-  connectFirebase: {fileID: 1079850346}
+  firebaseUpdateRecord: {fileID: 349905335}
   ReturnToHomeButton: {fileID: 176477540}
   connectingText: {fileID: 1885500225}
   whoWin: "\u52DD\u8005 : "
@@ -4315,6 +4401,49 @@ MonoBehaviour:
   putPositionPanel: {fileID: 1360710568}
   gameController: {fileID: 1703375494}
   playSE: {fileID: 1114165571}
+--- !u!1 &947771567
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 947771569}
+  - component: {fileID: 947771568}
+  m_Layer: 0
+  m_Name: SetUpGame
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &947771568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947771567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76e92edcd900ebf418d4a27723072f95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &947771569
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947771567}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 17
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &950415499
 GameObject:
   m_ObjectHideFlags: 0
@@ -4914,53 +5043,6 @@ MonoBehaviour:
   gameController: {fileID: 1703375494}
   syncBoardStatus: {fileID: 344092253}
   playSE: {fileID: 1114165571}
---- !u!1 &1079850345
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1079850347}
-  - component: {fileID: 1079850346}
-  m_Layer: 0
-  m_Name: ConnectFirebase
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1079850346
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1079850345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a4304a62b829fc45a4d5d165ed9dfe8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  matchingFlag: 0
-  gameRoomNumber: 
-  gameController: {fileID: 1703375494}
-  boardController: {fileID: 713595363}
---- !u!4 &1079850347
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1079850345}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 12
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1083171317
 GameObject:
   m_ObjectHideFlags: 0
@@ -5162,7 +5244,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 16
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1114165571
 MonoBehaviour:
@@ -5183,6 +5265,51 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 06b4de77a02d86f4d846c8ddc50af7ea, type: 3}
   - {fileID: 8300000, guid: 8597790664de7634db1a44a8a8985974, type: 3}
   - {fileID: 8300000, guid: ae5e93728da59c74492e323e54fe57b4, type: 3}
+--- !u!1 &1159253326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1159253328}
+  - component: {fileID: 1159253327}
+  m_Layer: 0
+  m_Name: UpdateBoard
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1159253327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159253326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c70c7ac6b3d08bd4d9448d8d3f2d5aa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameController: {fileID: 1703375494}
+  boardController: {fileID: 713595363}
+--- !u!4 &1159253328
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1159253326}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 18
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1168764716
 GameObject:
   m_ObjectHideFlags: 0
@@ -7841,7 +7968,11 @@ MonoBehaviour:
   timeCount: {fileID: 615787960}
   connectFailedPanel: {fileID: 847140969}
   npc: {fileID: 1852950269}
-  connectFirebase: {fileID: 1079850345}
+  firebaseFucntions:
+  - {fileID: 947771567}
+  - {fileID: 1159253326}
+  - {fileID: 349905334}
+  - {fileID: 131649942}
   syncboard: {fileID: 344092251}
   userNamePanel: {fileID: 395670493}
   connectingText: {fileID: 1885500225}
@@ -8793,7 +8924,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1943880265
 MonoBehaviour:

@@ -12,7 +12,7 @@ public class SyncBoardStatus : MonoBehaviour
 
     [SerializeField] BoardController boardController;
     [SerializeField] GameController gameController;
-    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] FirebaseUpdateBoardFunc firebaseUpdateBoard;
     [SerializeField] TimeCountPanel timeCountPanel;
     [SerializeField] Text connectingText;
     void Start(){
@@ -37,7 +37,7 @@ public class SyncBoardStatus : MonoBehaviour
     private void SetGo(){
         connectingText.enabled = true;
         UniTask.Create(async () => {
-            await connectFirebase.SetGo(boardController.LastUpdate);
+            await firebaseUpdateBoard.SetGo(boardController.LastUpdate);
             boardController.boardUpdated -= SyncBoard; //相手のボード更新時に呼び出せれないようにする
             connectingText.enabled = false;
         }).Forget();
@@ -47,7 +47,7 @@ public class SyncBoardStatus : MonoBehaviour
         connectingText.enabled = true;
         try{
             await UniTask.Run(async () => {
-                (int x, int z, int y, int color) rivalAction = await connectFirebase.WaitRivalAction();
+                (int x, int z, int y, int color) rivalAction = await firebaseUpdateBoard.WaitRivalAction();
                 boardController.AddGo(rivalAction.x, rivalAction.z, rivalAction.color);
                 boardController.boardUpdated += SyncBoard;
             });
@@ -70,7 +70,7 @@ public class SyncBoardStatus : MonoBehaviour
         connectingText.enabled = true;
         UniTask.Create(async () => {
             boardController.boardUpdated -= SyncBoard;
-            await connectFirebase.SetGo((GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal));
+            await firebaseUpdateBoard.SetGo((GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal));
             connectingText.enabled = false;
         }).Forget();
     }

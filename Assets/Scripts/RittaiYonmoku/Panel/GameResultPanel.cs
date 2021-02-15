@@ -8,7 +8,7 @@ public class GameResultPanel : MonoBehaviour
     [SerializeField] Text winnerText;
     [SerializeField] Text moveCountText;
     [SerializeField] GameController gameController;
-    [SerializeField] ConnectFirebase connectFirebase;
+    [SerializeField] FirebaseUpdateRecordFunc firebaseUpdateRecord;
     [SerializeField] Button ReturnToHomeButton;
     [SerializeField] Text connectingText;
     [SerializeField] string whoWin = "勝者 : ";
@@ -39,13 +39,13 @@ public class GameResultPanel : MonoBehaviour
         GameRecord currentRecord = null;
         connectingText.enabled = true;
         await UniTask.Run(async () => {
-            currentRecord = await connectFirebase.GetRecord(playerName);
+            currentRecord = await firebaseUpdateRecord.GetRecord(playerName);
         }).ContinueWith(async () => {
             if(winner == gameController.Player){
-                await connectFirebase.SetRecord(playerName, currentRecord.win + 1, currentRecord.lose);
+                await firebaseUpdateRecord.SetRecord(playerName, currentRecord.win + 1, currentRecord.lose);
             }
             else{
-                await connectFirebase.SetRecord(playerName, currentRecord.win, currentRecord.lose + 1);
+                await firebaseUpdateRecord.SetRecord(playerName, currentRecord.win, currentRecord.lose + 1);
             }
         });
         connectingText.enabled = false;

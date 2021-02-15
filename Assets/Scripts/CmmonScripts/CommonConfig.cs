@@ -37,7 +37,7 @@ namespace CommonConfig
         //オーディオ周りの設定
         private const float maxVolume = 2.0f;
         public static float MaxVolume{get {return maxVolume;}}
-        private const float maxBgmVolume = 10.0f;
+        private const float maxBgmVolume = 20.0f;
         public static float MaxBgmVolume{get {return maxBgmVolume;}}
         private const int buttonPushIndex = 0;
         public static int ButtonPushIndex{get {return buttonPushIndex;}}
