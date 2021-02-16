@@ -23,6 +23,8 @@ public class FirebaseUserRgisterFunc : BaseFirebaseFunc, IUserNameValidation, IS
             });
         }
         catch{
+            //エラーが発生した場合は、ユーザー名の重複登録を防ぐためfalseを返して
+            //ユーザー名の再入力を促す
             return false;
         }
     }

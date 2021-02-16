@@ -7,6 +7,7 @@ public class RegisterButton : MonoBehaviour
     [SerializeField] FirebaseUserRgisterFunc firebaseUserRegister;
     [SerializeField] FirebaseUpdateRecordFunc firebaseUpdateRecord;
     [SerializeField] PlaySE playSE;
+    [SerializeField] GameObject connectFailedPanel;
     public string inputUserName = "";
     private bool validFlag = false;
 
@@ -24,21 +25,27 @@ public class RegisterButton : MonoBehaviour
 
     public async void ButtonClicked(){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
-        connectingEvent(true); //通信処理に入る直前に通信中メッセージを表示する
+        connectingEvent(true);
         fetchUserNameEvent();
-        await UniTask.Run(async() => {
-            validFlag = await firebaseUserRegister.UserNameValidation(inputUserName);
-            return validFlag;
-        }).ContinueWith(async flag => {
-        if(flag){
-            await firebaseUserRegister.SetUserName(inputUserName);
-            PlayerPrefs.SetString(PlayerPrefsKey.UserNameKey, inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
-            await firebaseUpdateRecord.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 0, 0); //初回なので勝敗共に0
-            connectingEvent(false);
+        try{
+            await UniTask.Run(async() => {
+                validFlag = await firebaseUserRegister.UserNameValidation(inputUserName);
+                return validFlag;
+            }).ContinueWith(async flag => {
+            if(flag){
+                await firebaseUserRegister.SetUserName(inputUserName);
+                PlayerPrefs.SetString(PlayerPrefsKey.UserNameKey, inputUserName); //DBへの格納が成功した後にローカルへユーザー名登録
+                await firebaseUpdateRecord.SetRecord(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey), 0, 0); //初回なので勝敗共に0
+            }
+            else{
+                showAlertEvent(true);
+            }});
         }
-        else{
+        catch{
+            connectFailedPanel.SetActive(true);
+        }
+        finally{
             connectingEvent(false);
-            showAlertEvent(true);
-        }});
+        }    
     }
 }

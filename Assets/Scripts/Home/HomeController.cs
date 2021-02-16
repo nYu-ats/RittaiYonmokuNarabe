@@ -18,6 +18,7 @@ public class HomeController : MonoBehaviour
     
     //ゲーム起動時最初に実行させたいのでAwakeを使う
     async void Awake(){
+        PlayerPrefs.DeleteKey(PlayerPrefsKey.UserNameKey); //テスト用
         if(homeReadCount == 0){
             await DisplayTitlePanel(titleDisplayTime);
         }
