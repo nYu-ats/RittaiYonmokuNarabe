@@ -8,6 +8,7 @@ public class ReturnToHomeButton : MonoBehaviour
     [SerializeField] FirebaseCloseGameFunc firebaseCloseGame;
     [SerializeField] GameController gameController;
     [SerializeField] PlaySE playSE;
+    [SerializeField] PlayBGM playBGM;
     public async void OnClicked(){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
         //マルチプレイの時はホームに戻る前にFirebase上のゲームルームを削除する
@@ -17,6 +18,8 @@ public class ReturnToHomeButton : MonoBehaviour
             });
         }
         Time.timeScale = 1; //ホーム画面に戻る前にタイムスケールを元に戻す
+        playBGM.IsFadeOut = true;
+        await UniTask.WaitWhile(() => playBGM.IsFadeOut);
         SceneManager.LoadScene(GameSceneName.HomeScene);
     }
 }

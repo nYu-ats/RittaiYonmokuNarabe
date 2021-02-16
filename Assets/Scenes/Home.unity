@@ -4113,6 +4113,7 @@ MonoBehaviour:
   firebaseMatching: {fileID: 1745392593}
   connectingText: {fileID: 1236209708}
   playSE: {fileID: 909011490}
+  playBGM: {fileID: 1380983603}
 --- !u!1 &1363229585
 GameObject:
   m_ObjectHideFlags: 0
@@ -4190,6 +4191,7 @@ MonoBehaviour:
   - {fileID: 159473084}
   - {fileID: 1769298468}
   - {fileID: 165597030}
+  fadeSeconds: 1
 --- !u!82 &1380983604
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4898,6 +4900,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playSE: {fileID: 909011490}
+  playBGM: {fileID: 1380983603}
 --- !u!1 &1651745170
 GameObject:
   m_ObjectHideFlags: 0

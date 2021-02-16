@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using CommonConfig;
 using Cysharp.Threading.Tasks;
@@ -7,6 +6,7 @@ using Cysharp.Threading.Tasks;
 public class SoloPlayButton : BasePlayButton
 {
     [SerializeField] PlaySE playSE;
+    [SerializeField] PlayBGM playBGM;
     public async void OnButtonClicked(int modeNumber){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
         await UniTask.Delay(500); //ボタンクリック音の再生を待つ
@@ -21,6 +21,8 @@ public class SoloPlayButton : BasePlayButton
             playerColor = GameRule.SecondAttack;
             rivalColor = GameRule.FirstAttack;
         }
+        playBGM.IsFadeOut = true; //シーン
+        await UniTask.WaitWhile(() => playBGM.IsFadeOut);
         SceneManager.sceneLoaded += SetGameVariable;
         SceneManager.LoadScene(GameSceneName.GameScene);
     }
