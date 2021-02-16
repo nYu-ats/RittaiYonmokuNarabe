@@ -29,7 +29,6 @@ public class PlayBGM : MonoBehaviour
             FadeIn();
         }else if(isFadeOut){
             FadeOut();
-            Debug.Log(this.GetComponent<AudioSource>().volume);
         }
     }
 

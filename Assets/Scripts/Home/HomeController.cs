@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Cysharp.Threading.Tasks;
 using CommonConfig;
+using GoogleAdmob;
 
 public class HomeController : MonoBehaviour
 {
@@ -10,15 +11,20 @@ public class HomeController : MonoBehaviour
     [SerializeField] GameObject homePanel;
     [SerializeField] int titleDisplayTime = 5000;
     [SerializeField] GameObject playBGM;
+    [SerializeField] int adDisplayFrequency = 5;
+    private DisplayAdvertise displayAdvertise = new DisplayAdvertise();
     private static int homeReadCount = 0; //ホーム画面の読み込み回数をカウントする
     public static int HomeReadCount{get {return homeReadCount;}}
     
     //ゲーム起動時最初に実行させたいのでAwakeを使う
     async void Awake(){
-        //PlayerPrefs.DeleteKey("UserName"); //テスト用
         if(homeReadCount == 0){
             await DisplayTitlePanel(titleDisplayTime);
         }
+        else if(homeReadCount % adDisplayFrequency == 0){
+            displayAdvertise.RequestInterstitial();
+        }
+        //ユーザー名登録が完了してからホーム画面を表示する
         await ChkUserRegister();
         DisplayHomePanel();
         playBGM.SetActive(true);
