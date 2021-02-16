@@ -19,24 +19,36 @@ public class FirebaseSetUpGameFunc : BaseFirebaseFunc, ISetGameRoom, IGetRivalNa
     private bool gameRoomCrated = false;
 
     public async UniTask SetGameRoom(int roomNumber, int player){
-        await reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(player.ToString())
-              .SetValueAsync(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey));
+        try{
+            await reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(player.ToString())
+                  .SetValueAsync(PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey));
+        }
+        catch{
+            throw;
+        }
     }
 
     public async UniTask<string> GetRivalName(int roomNumber, int rival){
-        await reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(rival.ToString()).GetValueAsync().ContinueWith(task => {
-            if(task.Result.Exists){
-                rivalName = task.Result.GetRawJsonValue();
+        //ゲームルームから相手の名前を取得できた時点で
+        //相手が入室、マルチプレイを開始できると判断
+        try{
+            await reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(rival.ToString()).GetValueAsync().ContinueWith(task => {
+                if(task.Result.Exists){
+                    rivalName = task.Result.GetRawJsonValue();
+                }
+            });
+            if(rivalName == null){
+                reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(rival.ToString()).ValueChanged += ListenGameRoomStatus;
+                await UniTask.WaitUntil(() => gameRoomCrated).ContinueWith(() => {
+                    reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(rival.ToString()).ValueChanged -= ListenGameRoomStatus;
+                }).Timeout(TimeSpan.FromSeconds(30));
             }
-        });
-        if(rivalName == null){
-            reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(rival.ToString()).ValueChanged += ListenGameRoomStatus;
-            await UniTask.WaitUntil(() => gameRoomCrated).ContinueWith(() => {
-                reference.Child(roomNumber.ToString()).Child(GetKey.GamePlayer).Child(rival.ToString()).ValueChanged -= ListenGameRoomStatus;
-            }).Timeout(TimeSpan.FromSeconds(30));
+            rivalName = rivalName.Trim('\"');
+            return rivalName;
         }
-        rivalName = rivalName.Trim('\"');
-        return rivalName;
+        catch{
+            throw;
+        }
     }
 
     private void ListenGameRoomStatus(object sender, ValueChangedEventArgs args){

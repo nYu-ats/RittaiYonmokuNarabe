@@ -12,14 +12,19 @@ public class ReturnToHomeButton : MonoBehaviour
     public async void OnClicked(){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
         //マルチプレイの時はホームに戻る前にFirebase上のゲームルームを削除する
-        if(gameController.PlayMode == GameRule.MultiPlayMode){
-            await UniTask.Run(async () => {
-                await firebaseCloseGame.DeleteGameRoom();
-            });
+        try{
+            if(gameController.PlayMode == GameRule.MultiPlayMode){
+                await UniTask.Run(async () => {
+                    await firebaseCloseGame.DeleteGameRoom();
+                });
+            }
         }
-        Time.timeScale = 1; //ホーム画面に戻る前にタイムスケールを元に戻す
-        playBGM.IsFadeOut = true;
-        await UniTask.WaitWhile(() => playBGM.IsFadeOut);
-        SceneManager.LoadScene(GameSceneName.HomeScene);
+        catch{}
+        finally{
+            Time.timeScale = 1; //ホーム画面に戻る前にタイムスケールを元に戻す
+            playBGM.IsFadeOut = true;
+            await UniTask.WaitWhile(() => playBGM.IsFadeOut);
+            SceneManager.LoadScene(GameSceneName.HomeScene);
+        }
     }
 }

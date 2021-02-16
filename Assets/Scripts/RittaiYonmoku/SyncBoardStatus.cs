@@ -15,6 +15,7 @@ public class SyncBoardStatus : MonoBehaviour
     [SerializeField] FirebaseUpdateBoardFunc firebaseUpdateBoard;
     [SerializeField] TimeCountPanel timeCountPanel;
     [SerializeField] Text connectingText;
+    [SerializeField] GameObject connectFailedPanel;
     void Start(){
         gameController.setUpComplete += InitializeSyncStatus;
     }
@@ -36,11 +37,18 @@ public class SyncBoardStatus : MonoBehaviour
 
     private void SetGo(){
         connectingText.enabled = true;
-        UniTask.Create(async () => {
-            await firebaseUpdateBoard.SetGo(boardController.LastUpdate);
-            boardController.boardUpdated -= SyncBoard; //相手のボード更新時に呼び出せれないようにする
+        try{
+            UniTask.Create(async () => {
+                await firebaseUpdateBoard.SetGo(boardController.LastUpdate);
+                boardController.boardUpdated -= SyncBoard; //相手のボード更新時に呼び出せれないようにする
+            }).Forget();            
+        }
+        catch{
+            connectFailedPanel.SetActive(true);
+        }
+        finally{
             connectingText.enabled = false;
-        }).Forget();
+        }
     }
 
     private async void ListenRival(){
@@ -59,6 +67,9 @@ public class SyncBoardStatus : MonoBehaviour
             timeCountPanel.SwitchTimeCountStatus(false);
             rivalGiveUp();
         }
+        catch{
+            connectFailedPanel.SetActive(true);
+        }
         finally{
             connectingText.enabled = false;
         }
@@ -68,10 +79,15 @@ public class SyncBoardStatus : MonoBehaviour
         //自身が降参した時の処理
         //Firebaseに降参用のゲームステータスをセットする
         connectingText.enabled = true;
-        UniTask.Create(async () => {
-            boardController.boardUpdated -= SyncBoard;
-            await firebaseUpdateBoard.SetGo((GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal));
+        try{
+            UniTask.Create(async () => {
+                boardController.boardUpdated -= SyncBoard;
+                await firebaseUpdateBoard.SetGo((GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal, GameRule.GiveUpSignal));
+            }).Forget();
+        }
+        catch{}
+        finally{
             connectingText.enabled = false;
-        }).Forget();
+        }
     }
 }

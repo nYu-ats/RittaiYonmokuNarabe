@@ -44,7 +44,7 @@ public class FirebaseUpdateRecordFunc : BaseFirebaseFunc, ISetRecord, IGetRecord
         });
         }
         catch (UserRecordNullException){
-            //何らかの理由でレコードがなかった場合の暫定対応として勝敗共に0をセットする
+            //何らかの理由でレコードがなかった場合は、新しくレコードを作り直す
             await SetRecord(userName, 0, 0);
             return await GetRecord(userName);
         }

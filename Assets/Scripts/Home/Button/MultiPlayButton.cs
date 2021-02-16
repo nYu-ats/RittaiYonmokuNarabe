@@ -10,6 +10,7 @@ public class MultiPlayButton : BasePlayButton
     [SerializeField] Text connectingText;
     [SerializeField] PlaySE playSE;
     [SerializeField] PlayBGM playBGM;
+    [SerializeField] GameObject connectFailedPanel;
     public async void OnButtonClicked(int modeNumber){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
         loadPlayMode = modeNumber;
@@ -34,6 +35,7 @@ public class MultiPlayButton : BasePlayButton
         }
         catch{
             connectingText.enabled = false;
+            connectFailedPanel.SetActive(true);
         }
     }
 }

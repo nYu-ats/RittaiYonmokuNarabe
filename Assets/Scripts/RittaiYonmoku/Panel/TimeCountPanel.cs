@@ -24,9 +24,11 @@ public class TimeCountPanel : MonoBehaviour
     void Update()
     {
         if(doTimeCount){
-            time -= Time.deltaTime;
-            timeCountText.text = String.Format("Time : {0:00}", Mathf.Floor(time));
-            if(time <= 0){
+            if(time > 0.5f){
+                time -= Time.deltaTime;
+                timeCountText.text = String.Format("Time : {0:00}", Mathf.Floor(time));
+            }
+            else{
                 if(gameController.PlayMode == GameRule.SoloPlayMode){
                     //ソロプレイの場合は自身とNPC両ターンでタイムアウトを発生させる
                     timeOut();

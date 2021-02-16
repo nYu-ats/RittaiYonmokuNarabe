@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Firebase.Database;
 using FirebaseChildKey;
@@ -22,8 +23,14 @@ public class FirebaseUpdateBoardFunc : BaseFirebaseFunc, ISetGo, IWaitRivalActio
     private (int x, int z, int y, int color) rivalAction;
 
     public async UniTask SetGo((int x, int z, int y, int color) updateInfo){
-        string setKey = updateInfo.x.ToString() + updateInfo.z.ToString() + updateInfo.y.ToString();
-        await reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).Child(setKey).SetValueAsync(updateInfo.color.ToString());
+        try {
+            string setKey = updateInfo.x.ToString() + updateInfo.z.ToString() + updateInfo.y.ToString();
+            await reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).Child(setKey).SetValueAsync(updateInfo.color.ToString());
+        }
+        catch{
+            throw;
+        }
+        
     }
 
     public async UniTask<(int x, int z, int y, int color)> WaitRivalAction(){
@@ -31,7 +38,7 @@ public class FirebaseUpdateBoardFunc : BaseFirebaseFunc, ISetGo, IWaitRivalActio
             reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged += ListenGameStatusUpdate;
             await UniTask.WaitUntil(() => gameUpdated).ContinueWith(() => {
                 reference.Child(gameController.GameRoom.ToString()).Child(GetKey.GameStatus).ValueChanged -= ListenGameStatusUpdate;
-            }); //相手のTimeOutがあるのでこちらでTimeOutを設定する必要はない
+            }).Timeout(TimeSpan.FromSeconds(110)); //100秒間相手の更新がなければ通信失敗とみなしてゲームを終了する
             gameUpdated = false;
             if(rivalAction.x == GameRule.GiveUpSignal){
                 throw new GiveUpSignalReceive();
@@ -40,6 +47,9 @@ public class FirebaseUpdateBoardFunc : BaseFirebaseFunc, ISetGo, IWaitRivalActio
         }
         catch (GiveUpSignalReceive){
             //例外再スロー
+            throw;
+        }
+        catch{
             throw;
         }
     } 

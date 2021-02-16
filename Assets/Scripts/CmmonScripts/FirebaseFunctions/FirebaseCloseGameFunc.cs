@@ -9,6 +9,11 @@ public class FirebaseCloseGameFunc : BaseFirebaseFunc, IDeleteGamerRoom
 {
     [SerializeField] GameController gameController;
     public async UniTask DeleteGameRoom(){
-        await reference.Child(gameController.GameRoom.ToString()).SetValueAsync(null);
-    }    
+        try{
+            await reference.Child(gameController.GameRoom.ToString()).SetValueAsync(null);
+        }
+        catch{
+            throw;
+        }
+    }
 }

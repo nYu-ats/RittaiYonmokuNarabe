@@ -38,6 +38,7 @@ public class GameResultPanel : MonoBehaviour
     private async UniTask UpdateGameResult(int winner, string playerName){
         GameRecord currentRecord = null;
         connectingText.enabled = true;
+        try{
         await UniTask.Run(async () => {
             currentRecord = await firebaseUpdateRecord.GetRecord(playerName);
         }).ContinueWith(async () => {
@@ -48,6 +49,11 @@ public class GameResultPanel : MonoBehaviour
                 await firebaseUpdateRecord.SetRecord(playerName, currentRecord.win, currentRecord.lose + 1);
             }
         });
-        connectingText.enabled = false;
+
+        }
+        catch{}
+        finally{
+            connectingText.enabled = false;
+        }
     }
 }
