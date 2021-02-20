@@ -14,7 +14,7 @@ namespace CommonConfig
 
     public class PlayerPrefsKey
     {
-        //PlayerPrefsのキー
+        //PlayerPrefsの参照キー
         private const string userNameKey = "UserName";
         public static string UserNameKey{get {return userNameKey;}}
         
@@ -37,7 +37,9 @@ namespace CommonConfig
         //オーディオ周りの設定
         private const float maxVolume = 2.0f;
         public static float MaxVolume{get {return maxVolume;}}
-        private const float maxBgmVolume = 20.0f;
+        private const float maxBgmVolume = 2.0f;
+        
+        //playSEのclipのインデックス
         public static float MaxBgmVolume{get {return maxBgmVolume;}}
         private const int buttonPushIndex = 0;
         public static int ButtonPushIndex{get {return buttonPushIndex;}}
@@ -55,37 +57,14 @@ namespace CommonConfig
 
     public class Tags
     {
-        public class InHome
-        {
-            //ホーム画面で使っているタグ
-        }
-
         public class InRittaiYonmoku
         {
             //ゲーム画面で使っているタグ
             private const string gameContoroller = "GameController";
             public static string GameController{get {return gameContoroller;}}
-
-            private const string whiteGo = "WhiteGo";
-            public static string WhiteGo{get {return whiteGo;}}
-            private const string blackGo = "BlackGo";
-            public static string BlackGo{get {return blackGo;}}
             private const string reachChecker = "ReachChecker";
             public static string ReachChecker{get {return reachChecker;}}
-            private const string reachDisplaySwitcher = "ReachDisplaySwitcher";
-            public static string ReachDisplaySwitcher{get {return reachDisplaySwitcher;}}
-
-
         }
-    }
-
-    public class URL
-    {
-        private const string thisAppId = "mitei"; //決まり次第更新
-        public static string ThisAppId{get {return thisAppId;}}
-
-        private const string googleAppStoreURL = "https://play.google.com/store/apps/details?id=";
-        public static string GoogleAppStoreURL{get {return googleAppStoreURL;}}
     }
 
     public class GameRule
@@ -125,6 +104,8 @@ namespace CommonConfig
 
     public class NPCLevel
     {
+        //NPCのレベル
+        //現状イージーしかない
         private const int easyLevel = 1;
         public static int EasyLevel{get {return easyLevel;}}
 
@@ -138,6 +119,7 @@ namespace CommonConfig
 
     public class GamePhaseJudge
     {
+        //5ラインのリーチにからむことができる重要なポジションの配列
         private static (int x, int z, int limit)[] earlyPhasePoint
         = new (int x, int z, int limit)[8]{(x:0, z:0, limit:0), (x:0, z:3, limit:0), (x:3, z:0, limit:0), (x:3, z:3, limit:0),
                                            (x:1, z:1, limit:2), (x:1, z:2, limit:2), (x:2, z:1, limit:2), (x:2, z:2, limit:2)};
@@ -150,24 +132,36 @@ namespace CommonConfig
 
     public class LinePattern
     {
-        private const int pattern0 = 0; //単体の碁の状態
+        //碁単体の状態
+        private const int pattern0 = 0;
         public static int Pattern0{get{return pattern0;}}
-        private const int pattern1 = 1; //条件1 : XとY座標が変化しないライン
+
+        //条件1 : XとY座標が変化しないライン
+        private const int pattern1 = 1;
         public static int Pattern1{get{return pattern1;}}
 
-        private const int pattern2 = 2; //条件2 : ZとY座標が変化しないライン
+        //条件2 : ZとY座標が変化しないライン
+        private const int pattern2 = 2;
         public static int Pattern2{get{return pattern2;}}
 
-        private const int pattern3 = 3; //条件3 : XとZ座標が同じライン
+        //条件3 : XとZ座標が同じライン
+        private const int pattern3 = 3;
         public static int Pattern3{get{return pattern3;}}
 
-        private const int pattern4 = 4; //条件4 : X座標が変化せずYとZ座標が異なる(1ずつ上昇もしくは下降する)
+        //条件4 : X座標が変化せずYとZ座標が異なる(1ずつ上昇もしくは下降する)
+        private const int pattern4 = 4;
         public static int Pattern4{get{return pattern4;}}
-        private const int pattern5 = 5; //条件5 : Z座標が変化せずXとY座標が異なる(1ずつ上昇もしくは下降する)
+
+        //条件5 : Z座標が変化せずXとY座標が異なる(1ずつ上昇もしくは下降する)
+        private const int pattern5 = 5;
         public static int Pattern5{get{return pattern5;}}
-        private const int pattern6 = 6; //条件6 : Y座標が変化せずXとZ座標が異なる(1ずつ上昇もしくは下降する)
+
+        //条件6 : Y座標が変化せずXとZ座標が異なる(1ずつ上昇もしくは下降する)
+        private const int pattern6 = 6;
         public static int Pattern6{get{return pattern6;}}
-        private const int pattern7 = 7; //条件7 : X,Y,Z座標いずれも異なる(1ずつ上昇もしくは下降する)
+
+         //条件7 : X,Y,Z座標いずれも異なる(1ずつ上昇もしくは下降する)
+        private const int pattern7 = 7;
         public static int Pattern7{get{return pattern7;}}
 
     }

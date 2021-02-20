@@ -12,7 +12,8 @@ public class NPC : MonoBehaviour
     private bool thinking = false;
     private int level = NPCLevel.EasyLevel;
     private NPCBehavior nPCBehavior;
-    private (int x, int z, int limit)[] phaseJudgePoint = GamePhaseJudge.EarlyPhasePoint;
+    private (int x, int z, int limit)[] earylyImportantPos = GamePhaseJudge.EarlyPhasePoint;
+    private int middlePhaseGoCount = GamePhaseJudge.MiddlePhaseGoLimit;
 
     void Start(){
         if(gameController.Rival == GameRule.FirstAttack){
@@ -31,12 +32,12 @@ public class NPC : MonoBehaviour
         if(myColor == gameController.CurrentTurn & !thinking){
             thinking = true;
             await UniTask.Delay(1500); //碁を置くのが速すぎると、1手前に置いた碁と盤上で衝突してしまうため少し待機する
-            if(phaseJudgePoint.Any(item => boardController.CheckCanPut(item.x, item.z) <= item.limit 
+            if(earylyImportantPos.Any(item => boardController.CheckCanPut(item.x, item.z) <= item.limit 
                 & boardController.CheckCanPut(item.x, item.z) != BoardStatus.CanNotPut)){
                     //主要な位置がすべて埋まっていない間、序盤と判断する
                 nPCBehavior.earlyAction(boardController, myColor, rivalColor);
             }
-            else if(boardController.VacantPos().Length > 32){
+            else if(boardController.VacantPos().Length > middlePhaseGoCount){
                  //場に出ている碁の数が所定の個数を超えるまでを中盤と判断する
                 nPCBehavior.middleAction(boardController, myColor, rivalColor);
             }
