@@ -5,10 +5,13 @@ using CommonConfig;
 using System;
 public class GameController : MonoBehaviour
 {
-    public delegate void CheckMateEventHandler();
-    public event CheckMateEventHandler checkMateEvent = () => {};
+    public delegate void CheckMateEventHandler(string text);
+    public event CheckMateEventHandler checkMateEvent = (string text) => {};
     public delegate void SetUpCompleteEventHandler();
     public event SetUpCompleteEventHandler setUpComplete = () => {};
+
+    public delegate void DrawEventHandler(string text);
+    public event DrawEventHandler drawEvent = (string text) => {};
 
     [SerializeField] Button goPutButton;
     [SerializeField] Button giveUpButton;
@@ -21,6 +24,8 @@ public class GameController : MonoBehaviour
     [SerializeField] UserNamePanel userNamePanel;
     [SerializeField] Text connectingText;
     [SerializeField] GameObject playBGM;
+    private string checkMateText = "チェックメイト";
+    private string drawText = "ドロー";
     private int goNumber = GameRule.TotalGoNumber;
     public int GoNumber{get {return goNumber;}}
     private int currentTurn;
@@ -91,15 +96,21 @@ public class GameController : MonoBehaviour
     private void TurnChange(){
         if(!ConfirmCheckMate()){
             goNumber -= 1;
-            if(goNumber % 2 == 0){
-                //碁の数が偶数の場合は先行の白の手番
-                TurnSet(GameRule.FirstAttack);
+            if(goNumber == 0){
+                currentTurn = GameRule.DrawSignal;
+                drawEvent(drawText);
             }
             else{
-                //碁の数が奇数の場合は後攻の黒の手番
-                TurnSet(GameRule.SecondAttack);
+                if(goNumber % 2 == 0){
+                    //碁の数が偶数の場合は先行の白の手番
+                    TurnSet(GameRule.FirstAttack);
+                }
+                else{
+                    //碁の数が奇数の場合は後攻の黒の手番
+                    TurnSet(GameRule.SecondAttack);
+                }
             }
-        };
+        }
     }
 
     private void TurnSet(int nextTurn){
@@ -124,7 +135,7 @@ public class GameController : MonoBehaviour
             timeCount.SwitchTimeCountStatus(false);
             boardController.boardUpdated -= TurnChange; //チェックメイトが発生した場合はターンの切替を行わないようにする
             npc.SetActive(false); //currentTurnが相手の状態なので、余計な碁が置かれないようdisactiveにする
-            checkMateEvent();
+            checkMateEvent(checkMateText);
             return true;
         }
         else{

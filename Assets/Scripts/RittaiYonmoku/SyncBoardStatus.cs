@@ -7,8 +7,8 @@ using CustomException;
 public class SyncBoardStatus : MonoBehaviour
 {
     //相手が降参したことを通知するイベント
-    public delegate void RivalGiveUpEventHandler();
-    public event RivalGiveUpEventHandler rivalGiveUp = () => {}; 
+    public delegate void RivalGiveUpEventHandler(string text);
+    public event RivalGiveUpEventHandler rivalGiveUp = (string text) => {}; 
 
     [SerializeField] BoardController boardController;
     [SerializeField] GameController gameController;
@@ -16,6 +16,7 @@ public class SyncBoardStatus : MonoBehaviour
     [SerializeField] TimeCountPanel timeCountPanel;
     [SerializeField] Text connectingText;
     [SerializeField] GameObject connectFailedPanel;
+    private string giveUpText = "相手が降参しました";
     void Start(){
         gameController.setUpComplete += InitializeSyncStatus;
     }
@@ -65,7 +66,7 @@ public class SyncBoardStatus : MonoBehaviour
             gameController.CurrentTurn = gameController.Player;
             boardController.boardUpdated -= SyncBoard;
             timeCountPanel.SwitchTimeCountStatus(false);
-            rivalGiveUp();
+            rivalGiveUp(giveUpText);
         }
         catch{
             connectFailedPanel.SetActive(true);

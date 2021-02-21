@@ -28,5 +28,7 @@ ExportedObj/
 
 sysinfo.txt
 
+*.aab
 *.apk
 *.unitypackage
+*.keystore

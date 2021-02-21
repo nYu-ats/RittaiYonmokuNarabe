@@ -12,7 +12,7 @@ public class ToResultButton : MonoBehaviour
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
         //ゲームリザルトにはCrrentTurnのユーザーを勝者として表示するようになっており
         //ギブアップは自身のターンにしかできないため、CurrentTurnを相手に更新する
-        gameController.CurrentTurn += gameController.Rival;
+        gameController.CurrentTurn = gameController.Rival;
         gameResultPanel.SetActive(true);
         giveUpConfirmPanel.SetActive(false);
         if(gameController.PlayMode == GameRule.MultiPlayMode){

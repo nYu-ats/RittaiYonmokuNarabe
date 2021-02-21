@@ -11,22 +11,29 @@ public class GameResultPanel : MonoBehaviour
     [SerializeField] FirebaseUpdateRecordFunc firebaseUpdateRecord;
     [SerializeField] Button ReturnToHomeButton;
     [SerializeField] Text connectingText;
+    [SerializeField] Image drawImage;
     [SerializeField] string whoWin = "勝者 : ";
     [SerializeField] string moveCount =  "手";
     async void Start()
     {
         int winner = gameController.CurrentTurn;
         string playerName = PlayerPrefs.GetString(PlayerPrefsKey.UserNameKey);
+        moveCount = (GameRule.TotalGoNumber - gameController.GoNumber).ToString() + moveCount;
+
         if(winner == gameController.Player){
             whoWin += playerName;
         }
-        else{
+        else if(winner == gameController.Rival){
             whoWin += gameController.RivalName;
         }
-        moveCount = (GameRule.TotalGoNumber - gameController.GoNumber).ToString() + moveCount;
+        else{
+            //ドローだった場合
+            whoWin = "ドロー";
+            moveCount = "";
+        }
 
         //マルチプレイ時はFirebase上のゲーム結果を更新する
-        if(gameController.PlayMode == GameRule.MultiPlayMode){
+        if(gameController.PlayMode == GameRule.MultiPlayMode & winner != GameRule.DrawSignal){
             await UpdateGameResult(winner, playerName);
         }
 
@@ -45,7 +52,7 @@ public class GameResultPanel : MonoBehaviour
             if(winner == gameController.Player){
                 await firebaseUpdateRecord.SetRecord(playerName, currentRecord.win + 1, currentRecord.lose);
             }
-            else{
+            else if(winner == gameController.Rival){
                 await firebaseUpdateRecord.SetRecord(playerName, currentRecord.win, currentRecord.lose + 1);
             }
         });

@@ -13,6 +13,7 @@ public class MultiPlayButton : BasePlayButton
     [SerializeField] GameObject connectFailedPanel;
     public async void OnButtonClicked(int modeNumber){
         playSE.PlaySound(AudioConfig.ButtonPushIndex);
+        this.GetComponent<Button>().enabled = false; //複数回タップされるのを防ぐため
         loadPlayMode = modeNumber;
         connectingText.enabled = true;
         //マッチング完了を待機
@@ -36,6 +37,7 @@ public class MultiPlayButton : BasePlayButton
         catch{
             connectingText.enabled = false;
             connectFailedPanel.SetActive(true);
+            this.GetComponent<Button>().enabled = true;
         }
     }
 }
