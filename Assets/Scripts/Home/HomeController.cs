@@ -5,10 +5,8 @@ using CommonConfig;
 public class HomeController : MonoBehaviour
 {
     //PanelオブジェクトだとSetActiveが使えないためGameObjectとしてパネルを入れる
-    [SerializeField] GameObject gameTitlePanel;
     [SerializeField] GameObject userRegisterPanel;
     [SerializeField] GameObject homePanel;
-    [SerializeField] int titleDisplayTime = 5000;
     [SerializeField] GameObject playBGM;
     private static int homeReadCount = 1; //ホーム画面の読み込み回数をカウントする
     public static int HomeReadCount{get {return homeReadCount;}}
@@ -23,20 +21,11 @@ public class HomeController : MonoBehaviour
             PlayerPrefs.SetInt(PlayerPrefsKey.BgmVolumeKey, 2);
         }
 
-        if(homeReadCount == 1){
-            await DisplayTitlePanel(titleDisplayTime);
-        }
         //ユーザー名登録が完了してからホーム画面を表示する
         await ChkUserRegister();
         DisplayHomePanel();
         playBGM.SetActive(true);
         homeReadCount += 1;
-    }
-
-    private async UniTask DisplayTitlePanel(int time){
-        gameTitlePanel.SetActive(true);
-        await UniTask.Delay(time);
-        gameTitlePanel.SetActive(false);
     }
 
     private async UniTask ChkUserRegister(){
