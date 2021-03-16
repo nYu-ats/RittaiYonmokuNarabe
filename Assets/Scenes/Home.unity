@@ -3116,7 +3116,7 @@ MonoBehaviour:
   - {fileID: 1769298469}
   - {fileID: 165597031}
   focusedTextColor: {r: 255, g: 255, b: 255, a: 1}
-  focusedImageColor: {r: 0.74509805, g: 1, b: 0, a: 1}
+  focusedImageColor: {r: 1, g: 1, b: 1, a: 1}
   notFocusedTextColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   notFocusedImageColor: {r: 0.34901962, g: 0.34901962, b: 0.34901962, a: 1}
 --- !u!114 &988101190
@@ -6972,7 +6972,7 @@ MonoBehaviour:
   - {fileID: 2024535373}
   - {fileID: 30858374}
   focusedTextColor: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
-  focusedImageColor: {r: 0.74509805, g: 1, b: 0, a: 1}
+  focusedImageColor: {r: 1, g: 1, b: 1, a: 1}
   notFocusedTextColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   notFocusedImageColor: {r: 0.34901962, g: 0.34901962, b: 0.34901962, a: 1}
 --- !u!1 &2137751734
