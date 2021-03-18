@@ -10,7 +10,7 @@ interface IPinchInOut{
 
 public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
 {
-    [SerializeField] float initialRadius = 20.0f;
+    [SerializeField] float initialRadius = 35.0f;
     [SerializeField] float initialTheata = 45.0f; //デフォルト視点におけるX軸周りのカメラの傾き
     [SerializeField] float initialPhi = 45.0f; //デフォルト視点におけるY軸周りのカメラの傾き
     [SerializeField] float fitThetaChange = 0.1f; //カメラのX軸周りの回転速度の補正値
@@ -25,8 +25,8 @@ public class CameraMover : MonoBehaviour, IRollCamera, IPinchInOut
 
     //ピンチインピンチアウトの上限下限
     private enum RadiusRange{
-        Min = 10,
-        Max = 30
+        Min = 20,
+        Max = 50
     }
     private float tmpTheta;
     private float tmpPhi;
