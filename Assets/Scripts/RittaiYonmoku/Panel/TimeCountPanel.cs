@@ -26,7 +26,7 @@ public class TimeCountPanel : MonoBehaviour
         if(doTimeCount){
             if(time > 0.5f){
                 time -= Time.deltaTime;
-                timeCountText.text = String.Format("Time : {0:00}", Mathf.Floor(time));
+                timeCountText.text = String.Format(" : {0:00}", Mathf.Floor(time));
             }
             else{
                 if(gameController.PlayMode == GameRule.SoloPlayMode){

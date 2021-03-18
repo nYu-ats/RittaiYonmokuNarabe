@@ -7,8 +7,8 @@ public class ReachViewButton : MonoBehaviour
     //切替ボタンが押されたらeventを発生させる
     public delegate void ReachDisplaySwitchEventHandler();
     public event ReachDisplaySwitchEventHandler switchEvent = () => {};
-    [SerializeField] Text reachOnText;
-    [SerializeField] Text reachOffText;
+    [SerializeField] Image reachOnText;
+    [SerializeField] Image reachOffText;
     [SerializeField] PlaySE playSE;
     private bool currentFlag;
     public bool CurrentFlag{get {return currentFlag;}}
