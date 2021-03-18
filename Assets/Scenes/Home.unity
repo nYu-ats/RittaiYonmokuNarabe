@@ -5927,7 +5927,6 @@ GameObject:
   - component: {fileID: 1837438004}
   - component: {fileID: 1837438007}
   - component: {fileID: 1837438006}
-  - component: {fileID: 1837438005}
   m_Layer: 5
   m_Name: Review
   m_TagString: Untagged
@@ -5955,26 +5954,6 @@ RectTransform:
   m_AnchoredPosition: {x: 323, y: -1499}
   m_SizeDelta: {x: 400, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1837438005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1837438003}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f11aa8702be73c747b03d43a0530df81, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  volumeButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  focusedTextColor: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
-  focusedImageColor: {r: 0.74509805, g: 1, b: 0, a: 1}
-  notFocusedTextColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
-  notFocusedImageColor: {r: 0.34901962, g: 0.34901962, b: 0.34901962, a: 1}
 --- !u!114 &1837438006
 MonoBehaviour:
   m_ObjectHideFlags: 0
